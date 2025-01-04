@@ -66,7 +66,7 @@ class AppPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->tenant(Studio::class, 'uuid', 'users')
+            ->tenant(Studio::class, 'uuid')
             ->spa();
     }
 }

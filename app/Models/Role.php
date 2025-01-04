@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
-    //
+    public function studio(): BelongsTo
+    {
+        return $this->belongsTo(Studio::class, 'team_id');
+    }
 }

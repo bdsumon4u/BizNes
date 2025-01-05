@@ -8,9 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Devdojo\Auth\Models\User as AuthUser;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
-class User extends AuthUser implements FilamentUser
+class User extends AuthUser implements FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -47,6 +51,21 @@ class User extends AuthUser implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function businesses(): BelongsToMany
+    {
+        return $this->belongsToMany(Business::class);
+    }
+ 
+    public function getTenants(Panel $panel): Collection
+    {
+        return $this->businesses;
+    }
+ 
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->businesses()->whereKey($tenant)->exists();
     }
 
     public function canAccessPanel(Panel $panel): bool

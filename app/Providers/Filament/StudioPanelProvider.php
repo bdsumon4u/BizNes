@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Tenancy\EditBusinessProfile;
+use App\Filament\Pages\Tenancy\RegisterBusiness;
+use App\Models\Business;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -58,6 +61,9 @@ class StudioPanelProvider extends PanelProvider
                 Authenticate::class,
                 EnsureEmailIsVerified::class,
             ])
+            ->tenant(Business::class, 'uuid')
+            ->tenantRegistration(RegisterBusiness::class)
+            ->tenantProfile(EditBusinessProfile::class)
             ->spa();
     }
 }

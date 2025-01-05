@@ -13,10 +13,10 @@ return [
         'cluster' => null,
     ],
 
-    'tenant_model' => null,
+    'tenant_model' => 'App\\Models\\Studio',
 
     'auth_provider_model' => [
-        'fqcn' => 'App\\Models\\Admin',
+        'fqcn' => 'App\\Models\\User',
     ],
 
     'super_admin' => [

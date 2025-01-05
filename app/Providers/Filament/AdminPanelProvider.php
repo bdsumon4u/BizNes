@@ -22,6 +22,10 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        app(\Spatie\Permission\PermissionRegistrar::class)->teams = false;
+    }
     public function panel(Panel $panel): Panel
     {
         return $panel

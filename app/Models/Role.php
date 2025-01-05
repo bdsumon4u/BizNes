@@ -9,6 +9,6 @@ class Role extends SpatieRole
 {
     public function business(): BelongsTo
     {
-        return $this->belongsTo(Business::class, 'team_id');
+        return $this->belongsTo(Business::class);
     }
 }

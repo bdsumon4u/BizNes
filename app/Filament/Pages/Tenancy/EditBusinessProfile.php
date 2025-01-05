@@ -12,7 +12,7 @@ class EditBusinessProfile extends EditTenantProfile
     {
         return 'Business Profile';
     }
- 
+
     public function form(Form $form): Form
     {
         return $form

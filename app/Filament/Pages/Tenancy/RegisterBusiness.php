@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Tenancy;
 
 use App\Models\Business;
+use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -28,6 +29,8 @@ class RegisterBusiness extends RegisterTenant
         $business = Business::create($data);
  
         $business->users()->attach(Filament::auth()->user());
+
+        Utils::createPanelUserRole();
  
         return $business;
     }

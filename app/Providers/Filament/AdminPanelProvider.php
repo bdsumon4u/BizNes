@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->font('Roboto')
             ->globalSearch()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()
@@ -65,8 +66,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                DisablingTeamFeature::class,
             ])
+            ->authMiddleware([
+                // DisablingTeamFeature::class,
+            ], isPersistent: true)
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->authGuard('admin')
             ->spa();
     }

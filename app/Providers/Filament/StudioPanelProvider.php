@@ -36,6 +36,7 @@ class StudioPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->font('Roboto')
             ->globalSearch()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()
@@ -73,6 +74,7 @@ class StudioPanelProvider extends PanelProvider
             ->tenant(Business::class, 'uuid')
             ->tenantRegistration(RegisterBusiness::class)
             ->tenantProfile(EditBusinessProfile::class)
+            ->viteTheme('resources/css/filament/studio/theme.css')
             ->spa();
     }
 }

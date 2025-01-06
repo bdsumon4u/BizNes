@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\RoleResource\Pages;
+use App\Filament\Admin\Resources\RoleResource\RelationManagers\UsersRelationManager;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
 use BezhanSalleh\FilamentShield\Support\Utils;
@@ -125,7 +126,7 @@ class RoleResource extends Resource implements HasShieldPermissions
     public static function getRelations(): array
     {
         return [
-            //
+            UsersRelationManager::class,
         ];
     }
 
@@ -210,6 +211,7 @@ class RoleResource extends Resource implements HasShieldPermissions
 
     public static function getEloquentQuery(): Builder
     {
-        return static::getModel()::where(Utils::getTenantModelForeignKey(), 0);
+        return static::getModel()::where('guard_name', Utils::getFilamentAuthGuard())
+            ->whereNull(Utils::getTenantModelForeignKey());
     }
 }

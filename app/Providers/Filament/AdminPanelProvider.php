@@ -28,9 +28,17 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration()
+            ->passwordReset()
+            ->emailVerification()
+            ->profile()
+            ->simpleProfilePage(false)
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->globalSearch()
+            ->sidebarWidth('16rem')
+            ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([

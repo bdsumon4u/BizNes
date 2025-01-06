@@ -6,12 +6,15 @@ use Devdojo\Auth\Models\User as AuthUser;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends AuthUser implements FilamentUser, MustVerifyEmail
 {
-    use HasRoles, Notifiable;
+    use HasRoles, Notifiable {
+        HasRoles::roles as spatieRoles;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -45,6 +48,11 @@ class Admin extends AuthUser implements FilamentUser, MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->spatieRoles()->where('guard_name', 'admin');
     }
 
     public function canAccessPanel(Panel $panel): bool

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\UserResource\Pages;
-use App\Filament\Admin\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Admin\Resources\AdminResource\Pages;
+use App\Filament\Admin\Resources\AdminResource\RelationManagers;
+use App\Models\Admin;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -16,11 +16,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 
-class UserResource extends Resource
+class AdminResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Admin::class;
 
-    protected static ?string $modelLabel = 'client';
+    protected static ?string $modelLabel = 'user';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -61,10 +61,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('businesses_count')
-                    ->label(__('Businesses'))
-                    ->counts('businesses')
-                    ->sortable()
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->searchable()
                     ->badge(),
             ])
             ->filters([
@@ -92,9 +90,16 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            // 'create' => Pages\CreateUser::route('/create'),
-            // 'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListAdmins::route('/'),
+            // 'create' => Pages\CreateAdmin::route('/create'),
+            // 'edit' => Pages\EditAdmin::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return Utils::isResourceNavigationGroupEnabled()
+            ? __('filament-shield::filament-shield.nav.group')
+            : '';
     }
 }

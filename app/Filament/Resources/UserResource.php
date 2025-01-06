@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Resources;
 
-use App\Filament\Admin\Resources\UserResource\Pages;
-use App\Filament\Admin\Resources\UserResource\RelationManagers;
+use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Forms;
@@ -12,7 +12,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,9 +19,9 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $modelLabel = 'client';
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static ?string $tenantOwnershipRelationshipName = 'businesses';
 
     public static function form(Form $form): Form
     {
@@ -96,5 +95,12 @@ class UserResource extends Resource
             // 'create' => Pages\CreateUser::route('/create'),
             // 'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return Utils::isResourceNavigationGroupEnabled()
+            ? __('filament-shield::filament-shield.nav.group')
+            : '';
     }
 }

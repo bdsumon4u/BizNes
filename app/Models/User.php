@@ -17,7 +17,9 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends AuthUser implements FilamentUser, HasTenants, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable {
+        HasRoles::roles as spatieRoles;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -56,6 +58,11 @@ class User extends AuthUser implements FilamentUser, HasTenants, MustVerifyEmail
     public function businesses(): BelongsToMany
     {
         return $this->belongsToMany(Business::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->spatieRoles()->where('guard_name', 'web');
     }
 
     public function getTenants(Panel $panel): Collection

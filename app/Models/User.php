@@ -57,7 +57,7 @@ class User extends AuthUser implements FilamentUser, HasTenants, MustVerifyEmail
 
     public function businesses(): BelongsToMany
     {
-        return $this->belongsToMany(Business::class);
+        return $this->belongsToMany(Business::class)->withPivot('is_owner');
     }
 
     public function roles(): BelongsToMany

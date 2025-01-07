@@ -30,8 +30,8 @@ class StudioPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('studio')
-            ->path('studio')
+            ->id('app')
+            ->path('biz')
             ->profile()
             ->colors([
                 'primary' => Color::Blue,

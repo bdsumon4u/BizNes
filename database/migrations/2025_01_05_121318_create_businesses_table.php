@@ -16,7 +16,11 @@ return new class extends Migration
         Schema::create('businesses', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('name');
+            $table->string('name')->index();
+            $table->string('email')->unique();
+            $table->string('phone')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('phone_verified_at')->nullable();
             $table->timestamps();
         });
 
@@ -24,7 +28,10 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Business::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->boolean('is_owner')->default(false);
             $table->timestamps();
+
+            $table->unique(['business_id', 'user_id']);
         });
     }
 

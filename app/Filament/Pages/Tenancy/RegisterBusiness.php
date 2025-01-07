@@ -5,14 +5,14 @@ namespace App\Filament\Pages\Tenancy;
 use App\Models\Business;
 use App\Models\Role;
 use App\Models\User;
-use BezhanSalleh\FilamentShield\FilamentShield;
+use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;
 
 class RegisterBusiness extends RegisterTenant
 {
+    use BusinessForm;
+
     protected ?bool $hasDatabaseTransactions = true;
 
     public static function getLabel(): string
@@ -20,31 +20,40 @@ class RegisterBusiness extends RegisterTenant
         return 'Register Business';
     }
 
-    public function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                TextInput::make('name'),
-            ]);
-    }
-
     protected function handleRegistration(array $data): Business
     {
-        $business = Business::create($data);
-        $business->users()->attach(Filament::auth()->user());
-        $role = tap(FilamentShield::createRole(tenantId: $business->id), function (Role $role) {
-            $role->givePermissionTo(['view_role', 'view_any_role', 'create_role', 'update_role', 'delete_role', 'delete_any_role']);
-        });
+        $business = Business::query()->create($data);
+        $business->users()->attach(Filament::auth()->user(), ['is_owner' => true]);
 
         // temporary: get session team_id for restore at end
         $session_team_id = getPermissionsTeamId();
         // set actual new team_id to package instance
         setPermissionsTeamId($business);
         // get the admin user and assign roles/permissions on new team model
-        tap(Filament::auth()->user(), fn (User $user) => $user->assignRole($role));
+        tap(Filament::auth()->user(), fn (User $user) => $user->assignRole(
+            $this->getRole($business->id)
+        ));
         // restore session team_id to package instance using temporary value stored above
         setPermissionsTeamId($session_team_id);
 
         return $business;
+    }
+
+    private function getRole($businessId): Role
+    {
+        return tap(Utils::getRoleModel()::firstOrCreate(
+            [
+                'name' => Utils::getSuperAdminName(),
+                Utils::getTenantModelForeignKey() => $businessId,
+            ],
+            ['guard_name' => 'web']
+        ), fn (Role $role) => $role->givePermissionTo(
+            $this->getPermissions($businessId)
+        ));
+    }
+
+    private function getPermissions(): array
+    {
+        return Utils::getPermissionModel()::where('guard_name', 'web')->pluck('id')->toArray();
     }
 }

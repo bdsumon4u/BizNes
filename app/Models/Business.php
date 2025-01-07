@@ -20,7 +20,12 @@ class Business extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withPivot('is_owner');
+    }
+
+    public function owners(): BelongsToMany
+    {
+        return $this->users()->wherePivot('is_owner', true);
     }
 
     public function roles(): HasMany

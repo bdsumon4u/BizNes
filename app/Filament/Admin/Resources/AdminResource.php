@@ -5,11 +5,13 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\AdminResource\Pages;
 use App\Models\Admin;
 use BezhanSalleh\FilamentShield\Support\Utils;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
 class AdminResource extends Resource
@@ -17,6 +19,8 @@ class AdminResource extends Resource
     protected static ?string $model = Admin::class;
 
     protected static ?string $modelLabel = 'user';
+
+    protected static ?string $slug = 'users';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -41,7 +45,10 @@ class AdminResource extends Resource
                     ->multiple()
                     ->relationship('roles', 'name')
                     ->preload()
-                    ->searchable(),
+                    ->searchable()
+                    ->disabled(fn (?Model $record) => $record?->is(Filament::auth()->user()))
+                    ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
+                    ->hint(fn (?Model $record) => $record?->is(Filament::auth()->user()) ? __('You cannot change your own roles.') : null),
             ])
             ->columns(1);
     }

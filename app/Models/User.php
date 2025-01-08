@@ -64,6 +64,11 @@ class User extends AuthUser implements FilamentUser, HasTenants
         return $this->spatieRoles()->where('guard_name', 'web');
     }
 
+    public function isOwner(Business $business): bool
+    {
+        return $this->businesses()->wherePivot('is_owner', true)->whereKey($business)->exists();
+    }
+
     public function getTenants(Panel $panel): Collection
     {
         return $this->businesses;

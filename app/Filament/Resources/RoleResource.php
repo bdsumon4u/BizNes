@@ -43,6 +43,9 @@ class RoleResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
+                Forms\Components\Hidden::make('is_default')
+                    ->dehydrated(false)
+                    ->formatStateUsing(fn (?Model $record) => static::isDefaultRole($record)),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Section::make()
@@ -75,20 +78,17 @@ class RoleResource extends Resource implements HasShieldPermissions
                                     ->offIcon('heroicon-s-shield-exclamation')
                                     ->label(__('filament-shield::filament-shield.field.select_all.name'))
                                     ->helperText(fn (): HtmlString => new HtmlString(__('filament-shield::filament-shield.field.select_all.message')))
-                                    ->dehydrated(fn (bool $state): bool => $state),
-
+                                    ->dehydrated(fn (bool $state): bool => $state)
+                                    ->disabled(fn (Forms\Get $get) => $get('is_default')),
                             ])
                             ->columns([
                                 'sm' => 2,
                                 'lg' => 3,
                             ]),
                     ]),
-                Forms\Components\Hidden::make('is_default')
-                    ->dehydrated(false)
-                    ->formatStateUsing(fn (?Model $record) => static::isDefaultRole($record)),
                 Forms\Components\Placeholder::make('permissions')
                     ->content(new HtmlString(Blade::render('
-                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">Super Admin</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>'
+                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">'.Utils::getSuperAdminName().'</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>'
                     )))
                     ->visible(fn (Forms\Get $get) => $get('is_default')),
                 static::getShieldFormComponents()

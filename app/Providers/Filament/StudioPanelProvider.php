@@ -7,10 +7,12 @@ use App\Filament\Pages\Tenancy\RegisterBusiness;
 use App\Models\Business;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -72,6 +74,11 @@ class StudioPanelProvider extends PanelProvider
                 EnsureEmailIsVerified::class,
             ])
             ->tenant(Business::class, 'uuid')
+            ->tenantMenuItems([
+                'register' => MenuItem::make()->visible(function () {
+                    return optional(Filament::auth()->user())->businesses()->count() < 4;
+                }),
+            ])
             ->tenantRegistration(RegisterBusiness::class)
             ->tenantProfile(EditBusinessProfile::class)
             ->viteTheme('resources/css/filament/studio/theme.css')

@@ -16,8 +16,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class RoleResource extends Resource implements HasShieldPermissions
 {
@@ -47,7 +50,10 @@ class RoleResource extends Resource implements HasShieldPermissions
                             ->schema([
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('filament-shield::filament-shield.field.name'))
-                                    ->unique(ignoreRecord: true)
+                                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule) {
+                                        return $rule->whereNull(Utils::getTenantModelForeignKey())
+                                            ->where('guard_name', Utils::getFilamentAuthGuard());
+                                    })
                                     ->required()
                                     ->maxLength(255),
 
@@ -55,7 +61,8 @@ class RoleResource extends Resource implements HasShieldPermissions
                                     ->label(__('filament-shield::filament-shield.field.guard_name'))
                                     ->default(Utils::getFilamentAuthGuard())
                                     ->nullable()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->readonly(),
 
                                 Forms\Components\Select::make(config('permission.column_names.team_foreign_key'))
                                     ->label(__('filament-shield::filament-shield.field.team'))
@@ -78,7 +85,16 @@ class RoleResource extends Resource implements HasShieldPermissions
                                 'lg' => 3,
                             ]),
                     ]),
-                static::getShieldFormComponents(),
+                Forms\Components\Hidden::make('is_default')
+                    ->dehydrated(false)
+                    ->formatStateUsing(fn (?Model $record) => static::isDefaultRole($record)),
+                Forms\Components\Placeholder::make('permissions')
+                    ->content(new HtmlString(Blade::render('
+                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">Super Admin</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>'
+                    )))
+                    ->visible(fn (Forms\Get $get) => $get('is_default')),
+                static::getShieldFormComponents()
+                    ->disabled(fn (Forms\Get $get) => $get('is_default')),
             ]);
     }
 
@@ -138,6 +154,17 @@ class RoleResource extends Resource implements HasShieldPermissions
             'view' => Pages\ViewRole::route('/{record}'),
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
+    }
+
+    public static function isDefaultRole(?Model $record): bool
+    {
+        if (! $record) {
+            return false;
+        }
+
+        return static::getEloquentQuery()
+            ->where('id', '<', $record->id)
+            ->doesntExist();
     }
 
     public static function getCluster(): ?string

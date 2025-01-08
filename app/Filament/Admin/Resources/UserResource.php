@@ -7,8 +7,11 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -54,6 +57,8 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->icon(fn (User $record) => $record->hasVerifiedEmail() ? 'heroicon-o-check-badge' : null)
+                    ->iconColor(fn (User $record) => $record->hasVerifiedEmail() ? Color::Green : null)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('businesses_count')
@@ -63,7 +68,17 @@ class UserResource extends Resource
                     ->badge(),
             ])
             ->filters([
-                //
+                // translation
+                TernaryFilter::make('email_verified_at')
+                    ->label('Email Verification')
+                    ->placeholder('Any')
+                    ->trueLabel('Verified')
+                    ->falseLabel('Not Verified')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
+                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
+                        blank: fn (Builder $query) => $query, // In this example, we do not want to filter the query when it is blank.
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

@@ -47,7 +47,8 @@ class RoleResource extends Resource implements HasShieldPermissions
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('filament-shield::filament-shield.field.name'))
                                     ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule) {
-                                        return $rule->whereNull(Utils::getTenantModelForeignKey());
+                                        return $rule->where(Utils::getTenantModelForeignKey(), Filament::getTenant()?->id)
+                                            ->where('guard_name', Utils::getFilamentAuthGuard());
                                     })
                                     ->required()
                                     ->maxLength(255),

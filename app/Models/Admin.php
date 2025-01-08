@@ -5,12 +5,11 @@ namespace App\Models;
 use Devdojo\Auth\Models\User as AuthUser;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class Admin extends AuthUser implements FilamentUser, MustVerifyEmail
+class Admin extends AuthUser implements FilamentUser
 {
     use HasRoles, Notifiable {
         HasRoles::roles as spatieRoles;

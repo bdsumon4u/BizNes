@@ -41,8 +41,7 @@ class AdminResource extends Resource
                     ->multiple()
                     ->relationship('roles', 'name')
                     ->preload()
-                    ->searchable()
-                    ->required(),
+                    ->searchable(),
             ])
             ->columns(1);
     }

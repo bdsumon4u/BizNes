@@ -22,11 +22,13 @@ trait BusinessForm
                     ->maxLength(255),
                 TextInput::make('email')
                     ->email()
-                    ->required(),
+                    ->required()
+                    ->unique(ignoreRecord: true),
                 PhoneInput::make('phone')
                     ->required()
                     ->defaultCountry('BD')
-                    ->initialCountry('BD'),
+                    ->initialCountry('BD')
+                    ->unique(ignoreRecord: true),
             ]);
     }
 }

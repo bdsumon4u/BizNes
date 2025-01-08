@@ -41,6 +41,10 @@ class EditRole extends EditRecord
 
     protected function afterSave(): void
     {
+        if (static::$resource::isDefaultRole($this->record)) {
+            return;
+        }
+
         $permissionModels = collect();
         $this->permissions->each(function ($permission) use ($permissionModels) {
             $permissionModels->push(Utils::getPermissionModel()::firstOrCreate([

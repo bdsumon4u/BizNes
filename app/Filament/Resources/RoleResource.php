@@ -14,6 +14,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
@@ -80,7 +83,16 @@ class RoleResource extends Resource implements HasShieldPermissions
                                 'lg' => 3,
                             ]),
                     ]),
-                static::getShieldFormComponents(),
+                Forms\Components\Hidden::make('is_default')
+                    ->dehydrated(false)
+                    ->formatStateUsing(fn (?Model $record) => static::isDefaultRole($record)),
+                Forms\Components\Placeholder::make('permissions')
+                    ->content(new HtmlString(Blade::render('
+                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">Super Admin</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>'
+                    )))
+                    ->visible(fn (Forms\Get $get) => $get('is_default')),
+                static::getShieldFormComponents()
+                    ->disabled(fn (Forms\Get $get) => $get('is_default')),
             ]);
     }
 
@@ -140,6 +152,17 @@ class RoleResource extends Resource implements HasShieldPermissions
             'view' => Pages\ViewRole::route('/{record}'),
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
+    }
+
+    public static function isDefaultRole(?Model $record): bool
+    {
+        if (! $record) {
+            return false;
+        }
+
+        return static::getEloquentQuery()
+            ->where('id', '<', $record->id)
+            ->doesntExist();
     }
 
     public static function getCluster(): ?string

@@ -44,9 +44,6 @@ class RoleResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
-                Forms\Components\Hidden::make('is_default')
-                    ->dehydrated(false)
-                    ->formatStateUsing(fn (?Model $record) => static::isDefaultRole($record)),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Section::make()
@@ -132,8 +129,7 @@ class RoleResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->disabled(fn ($record): bool => static::isDefaultRole($record)),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -155,17 +151,6 @@ class RoleResource extends Resource implements HasShieldPermissions
             'view' => Pages\ViewRole::route('/{record}'),
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
-    }
-
-    public static function isDefaultRole(?Model $record): bool
-    {
-        if (! $record) {
-            return false;
-        }
-
-        return static::getEloquentQuery()
-            ->where('id', '<', $record->id)
-            ->doesntExist();
     }
 
     public static function getCluster(): ?string

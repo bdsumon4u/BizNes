@@ -44,6 +44,7 @@ class AdminResource extends Resource
                 Forms\Components\Select::make('roles')
                     ->multiple()
                     ->relationship('roles', 'name')
+                    ->disableOptionWhen(fn (string $label) => $label === Utils::getSuperAdminName() && ! optional(Filament::auth()->user())->hasRole(Utils::getSuperAdminName()))
                     ->preload()
                     ->searchable()
                     ->disabled(fn (?Model $record) => $record?->is(Filament::auth()->user()))
@@ -59,7 +60,8 @@ class AdminResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->suffix(fn (Model $record) => $record->is(Filament::auth()->user()) ? ' (you)' : null),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),

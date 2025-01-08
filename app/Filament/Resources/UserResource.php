@@ -5,11 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Support\Utils;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -39,10 +41,17 @@ class UserResource extends Resource
                     ->required(fn (string $context): bool => $context === 'create'),
                 Forms\Components\Select::make('roles')
                     ->multiple()
-                    ->relationship('roles', 'name')
+                    ->relationship('roles', 'name', modifyQueryUsing: function ($query) {
+                        $query->whereBelongsTo(Filament::getTenant());
+                        if (! optional(Filament::auth()->user())->hasRole(Utils::getSuperAdminName())) {
+                            $query->where('name', '!=', Utils::getSuperAdminName());
+                        }
+                    })
                     ->preload()
                     ->searchable()
-                    ->required(),
+                    ->disabled(fn (?Model $record) => $record?->is(Filament::auth()->user()))
+                    ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
+                    ->hint(fn (?Model $record) => $record?->is(Filament::auth()->user()) ? __('You cannot change your own roles.') : null),
             ])
             ->columns(1);
     }
@@ -53,7 +62,8 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->suffix(fn (Model $record) => $record->is(Filament::auth()->user()) ? ' (you)' : null),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),

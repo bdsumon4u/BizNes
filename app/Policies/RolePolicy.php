@@ -12,8 +12,13 @@ class RolePolicy
 {
     use HandlesAuthorization;
 
-    public function before(Admin|User $user): ?bool
+    public function before(Admin|User $user, string $ability, Role|string $role): ?bool
     {
+        // dd($user, $ability, $role);
+        if ($role instanceof Role && $role->isSuperAdmin()) {
+            return false;
+        }
+
         if ($user instanceof User && $user->isOwner(Filament::getTenant())) {
             return true;
         }
@@ -50,7 +55,7 @@ class RolePolicy
      */
     public function update(Admin|User $user, Role $role): bool
     {
-        return $user->can('update_role');
+        return $user->can('update_role') && ! $role->isSuperAdmin() && ! $user->hasRole($role);
     }
 
     /**
@@ -58,7 +63,7 @@ class RolePolicy
      */
     public function delete(Admin|User $user, Role $role): bool
     {
-        return $user->can('delete_role');
+        return $user->can('delete_role') && ! $role->isSuperAdmin() && ! $user->hasRole($role);
     }
 
     /**

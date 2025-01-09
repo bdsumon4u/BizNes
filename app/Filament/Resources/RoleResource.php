@@ -85,11 +85,16 @@ class RoleResource extends Resource implements HasShieldPermissions
                     ]),
                 Forms\Components\Placeholder::make('permissions')
                     ->content(new HtmlString(Blade::render('
-                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">'.Utils::getSuperAdminName().'</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>'
-                    )))
-                    ->visible(fn (Forms\Get $get) => $get('is_default')),
+                        <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">'.Utils::getSuperAdminName().'</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>
+                    ')))
+                    ->visible(fn (Model $record) => $record->isSuperAdmin()),
+                Forms\Components\Placeholder::make('permissions')
+                    ->content(new HtmlString(Blade::render('
+                        <div class="flex">You belong to this role. You can <x-filament::badge color="danger" class="px-1 mx-1">NOT</x-filament::badge> edit your own role.</div>
+                    ')))
+                    ->visible(fn (Model $record) => optional(Filament::auth()->user())->hasRole($record)),
                 static::getShieldFormComponents()
-                    ->disabled(fn (Forms\Get $get) => $get('is_default')),
+                    ->disabled(fn (Model $record) => $record->isSuperAdmin() || optional(Filament::auth()->user())->hasRole($record)),
             ]);
     }
 

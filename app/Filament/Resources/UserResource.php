@@ -9,10 +9,13 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\HtmlString;
 
 class UserResource extends Resource
 {
@@ -63,7 +66,15 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->suffix(fn (Model $record) => $record->is(Filament::auth()->user()) ? ' (you)' : null),
+                    ->formatStateUsing(function (Model $record) {
+                        if (!$record->is(Filament::auth()->user())) {
+                            return $record->name;
+                        }
+
+                        return new HtmlString(Blade::render('
+                            <div class="flex">'.$record->name.' <x-filament::badge color="info" class="px-1 mx-1">YOU</x-filament::badge></div>
+                        '));
+                    }),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),

@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -47,6 +48,7 @@ class UserResource extends Resource
                     ->hintIcon('heroicon-o-exclamation-circle')
                     ->hint(__('Also an owner of this business.'))
                     ->dehydrated(false)
+                    ->formatStateUsing(fn (?Model $record) => $record?->isOwner(Filament::getTenant()))
                     ->afterStateUpdated(fn (bool $state, Forms\Set $set) => $state && $set('roles', [
                         Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
                             ->where('name', Utils::getSuperAdminName())
@@ -86,7 +88,9 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->icon(fn (Model $record) => $record->is(Filament::auth()->user()) ? 'heroicon-o-star' : null)
+                    ->color(fn (Model $record) => $record->is(Filament::auth()->user()) ? Color::Green : null)
+                    ->weight(fn (Model $record) => $record->is(Filament::auth()->user()) ? FontWeight::SemiBold : null)
+                    ->icon(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'heroicon-o-sparkles' : null)
                     ->iconPosition(IconPosition::After),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
@@ -113,6 +117,24 @@ class UserResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->slideOver()
                     ->modalWidth('md'),
+                Tables\Actions\Action::make('partner')
+                    ->databaseTransaction()
+                    ->action(function (Model $record) {
+                        if (! $isOwner = $record->isOwner(Filament::getTenant())) {
+                            $record->assignRole(
+                                Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
+                                    ->where('name', Utils::getSuperAdminName())
+                                    ->firstOrFail()
+                            );
+                        }
+                        $record->businesses()->updateExistingPivot(Filament::getTenant(), [
+                            'is_owner' => ! $isOwner,
+                        ]);
+                    })
+                    ->icon(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'heroicon-o-x-circle' : 'heroicon-o-exclamation-triangle')
+                    ->color(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'danger' : 'warning')
+                    ->hidden(fn (Model $record) => $record->is(Filament::auth()->user()))
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

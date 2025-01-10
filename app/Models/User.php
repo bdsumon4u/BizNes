@@ -59,14 +59,19 @@ class User extends AuthUser implements FilamentUser, HasTenants
         return $this->belongsToMany(Business::class)->withPivot('is_owner');
     }
 
-    public function roles(): BelongsToMany
+    public function ownedBusinesses(): BelongsToMany
     {
-        return $this->spatieRoles()->where('guard_name', 'web');
+        return $this->businesses()->wherePivot('is_owner', true);
     }
 
     public function isOwner(Business $business): bool
     {
-        return $this->businesses()->wherePivot('is_owner', true)->whereKey($business)->exists();
+        return $this->ownedBusinesses()->whereKey($business)->exists();
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->spatieRoles()->where('guard_name', 'web');
     }
 
     public function getTenants(Panel $panel): Collection

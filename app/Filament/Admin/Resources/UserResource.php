@@ -41,12 +41,6 @@ class UserResource extends Resource
                     ->dehydrateStateUsing(fn (string $state) => Hash::make($state))
                     ->dehydrated(fn (?string $state) => filled($state))
                     ->required(fn (string $context): bool => $context === 'create'),
-                Forms\Components\Select::make('roles')
-                    ->multiple()
-                    ->relationship('roles', 'name')
-                    ->preload()
-                    ->searchable()
-                    ->required(),
             ])
             ->columns(1);
     }
@@ -59,28 +53,28 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->icon(fn (User $record) => $record->hasVerifiedEmail() ? 'heroicon-o-check-badge' : null)
-                    ->iconColor(fn (User $record) => $record->hasVerifiedEmail() ? Color::Green : null)
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('businesses_count')
+                    ->sortable()
+                    ->icon(fn (User $record) => $record->hasVerifiedEmail() ? 'heroicon-o-check-badge' : null)
+                    ->iconColor(fn (User $record) => $record->hasVerifiedEmail() ? Color::Green : null),
+                Tables\Columns\TextColumn::make('owned_businesses_count')
                     ->label(__('Businesses'))
                     ->counts('businesses')
                     ->sortable()
                     ->badge(),
             ])
             ->filters([
-                // translation
                 TernaryFilter::make('email_verified_at')
-                    ->label('Email Verification')
-                    ->placeholder('Any')
-                    ->trueLabel('Verified')
-                    ->falseLabel('Not Verified')
+                    ->label(__('Email Verification'))
+                    ->placeholder(__('Any'))
+                    ->trueLabel(__('Verified'))
+                    ->falseLabel(__('Unverified'))
                     ->queries(
                         true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
                         false: fn (Builder $query) => $query->whereNull('email_verified_at'),
                         blank: fn (Builder $query) => $query, // In this example, we do not want to filter the query when it is blank.
-                    ),
+                    )
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -108,5 +102,12 @@ class UserResource extends Resource
             // 'create' => Pages\CreateUser::route('/create'),
             // 'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereHas('ownedBusinesses')
+            ->withCount('ownedBusinesses');
     }
 }

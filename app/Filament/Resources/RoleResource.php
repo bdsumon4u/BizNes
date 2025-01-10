@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -132,7 +133,27 @@ class RoleResource extends Resource implements HasShieldPermissions
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->action(function (Tables\Actions\DeleteBulkAction $action) {
+                        $deleted = $action->process(static fn (Collection $records) => $records
+                            ->filter(function (Model $record) use ($action) {
+                                if ($record->isSuperAdmin()) {
+                                    return $action->failureNotificationTitle(__('You cannot delete the super admin role.'))->failure();
+                                }
+
+                                if (optional(Filament::auth()->user())->hasRole($record)) {
+                                    return $action->failureNotificationTitle(__('You cannot delete your own role.'))->failure();
+                                }
+
+                                return true;
+                            })
+                            ->map(fn (Model $record) => $record->delete())
+                        );
+
+                        if ($deleted->isNotEmpty()) {
+                            $action->success();
+                        }
+                    }),
             ]);
     }
 

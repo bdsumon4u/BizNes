@@ -9,12 +9,12 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\HtmlString;
 
 class UserResource extends Resource
 {
@@ -41,18 +41,39 @@ class UserResource extends Resource
                     ->dehydrateStateUsing(fn (string $state) => Hash::make($state))
                     ->dehydrated(fn (?string $state) => filled($state))
                     ->required(fn (string $context): bool => $context === 'create'),
+                Forms\Components\Toggle::make('is_partner')
+                    ->label(__('Partner'))
+                    ->onIcon('heroicon-o-exclamation-triangle')
+                    ->hintIcon('heroicon-o-exclamation-circle')
+                    ->hint(__('Also an owner of this business.'))
+                    ->dehydrated(false)
+                    ->afterStateUpdated(fn (bool $state, Forms\Set $set) => $state && $set('roles', [
+                        Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
+                            ->where('name', Utils::getSuperAdminName())
+                            ->firstOrFail()
+                            ->getKey(),
+                    ]))
+                    ->live(),
                 Forms\Components\Select::make('roles')
                     ->multiple()
-                    ->relationship('roles', 'name', modifyQueryUsing: function ($query) {
-                        $query->whereBelongsTo(Filament::getTenant());
-                        if (! optional(Filament::auth()->user())->hasRole(Utils::getSuperAdminName())) {
-                            $query->where('name', '!=', Utils::getSuperAdminName());
-                        }
-                    })
+                    ->relationship('roles', 'name', fn ($query) => $query->whereBelongsTo(Filament::getTenant()))
+                    ->pivotData([Utils::getTenantModelForeignKey() => Filament::getTenant()->getKey()])
                     ->preload()
                     ->searchable()
-                    ->disabled(fn (?Model $record) => $record?->is(Filament::auth()->user()))
-                    ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->saveRelationshipsWhenHidden(fn (Forms\Get $get) => $get('is_partner'))
+                    ->hidden(function (?Model $record, Forms\Get $get) {
+                        if ($get('is_partner') || $record?->is(Filament::auth()->user())) {
+                            return true;
+                        }
+
+                        if ($record?->isOwner(Filament::getTenant())) {
+                            return ! optional(Filament::auth()->user())->isOwner(Filament::getTenant());
+                        }
+
+                        return false;
+                    })
+                    // ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
                     ->hint(fn (?Model $record) => $record?->is(Filament::auth()->user()) ? __('You cannot change your own roles.') : null),
             ])
             ->columns(1);
@@ -65,23 +86,25 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->formatStateUsing(function (Model $record) {
-                        if (! $record->is(Filament::auth()->user())) {
-                            return $record->name;
-                        }
-
-                        return new HtmlString(Blade::render('
-                            <div class="flex">'.$record->name.' <x-filament::badge color="info" class="px-1 mx-1">YOU</x-filament::badge></div>
-                        '));
-                    }),
+                    ->icon(fn (Model $record) => $record->is(Filament::auth()->user()) ? 'heroicon-o-star' : null)
+                    ->iconPosition(IconPosition::After),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->icon(fn (User $record) => $record->hasVerifiedEmail() ? 'heroicon-o-check-badge' : null)
+                    ->iconColor(fn (User $record) => $record->hasVerifiedEmail() ? Color::Green : null),
                 Tables\Columns\TextColumn::make('businesses_count')
                     ->label(__('Businesses'))
                     ->counts('businesses')
                     ->sortable()
                     ->badge(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->searchable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        Utils::getSuperAdminName() => 'success',
+                        default => 'primary',
+                    }),
             ])
             ->filters([
                 //

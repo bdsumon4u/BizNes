@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Admin;
 use App\Models\Role;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RolePolicy

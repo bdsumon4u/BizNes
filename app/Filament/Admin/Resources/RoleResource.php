@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -76,8 +77,7 @@ class RoleResource extends Resource implements HasShieldPermissions
                                     ->offIcon('heroicon-s-shield-exclamation')
                                     ->label(__('filament-shield::filament-shield.field.select_all.name'))
                                     ->helperText(fn (): HtmlString => new HtmlString(__('filament-shield::filament-shield.field.select_all.message')))
-                                    ->dehydrated(fn (bool $state): bool => $state)
-                                    ->disabled(fn (Model $record) => $record->isSuperAdmin()),
+                                    ->dehydrated(fn (bool $state): bool => $state),
                             ])
                             ->columns([
                                 'sm' => 2,
@@ -88,14 +88,13 @@ class RoleResource extends Resource implements HasShieldPermissions
                     ->content(new HtmlString(Blade::render('
                         <div class="flex">This is the default <x-filament::badge class="px-1 mx-1">'.Utils::getSuperAdminName().'</x-filament::badge> role. It has <x-filament::badge class="px-1 mx-1">ALL</x-filament::badge> permissions by default.</div>
                     ')))
-                    ->visible(fn (Model $record) => $record->isSuperAdmin()),
+                    ->visible(fn (?Model $record) => $record?->isSuperAdmin()),
                 Forms\Components\Placeholder::make('permissions')
                     ->content(new HtmlString(Blade::render('
                         <div class="flex">You belong to this role. You can <x-filament::badge color="danger" class="px-1 mx-1">NOT</x-filament::badge> edit your own role.</div>
                     ')))
-                    ->visible(fn (Model $record) => optional(Filament::auth()->user())->hasRole($record)),
-                static::getShieldFormComponents()
-                    ->disabled(fn (Model $record) => $record->isSuperAdmin() || optional(Filament::auth()->user())->hasRole($record)),
+                    ->visible(fn (?Model $record) => $record?->exists && optional(Filament::auth()->user())->hasRole($record)),
+                static::getShieldFormComponents(),
             ]);
     }
 
@@ -136,7 +135,27 @@ class RoleResource extends Resource implements HasShieldPermissions
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->action(function (Tables\Actions\DeleteBulkAction $action) {
+                        $deleted = $action->process(static fn (Collection $records) => $records
+                            ->filter(function (Model $record) use ($action) {
+                                if ($record->isSuperAdmin()) {
+                                    return $action->failureNotificationTitle(__('You cannot delete the super admin role.'))->failure();
+                                }
+
+                                if (optional(Filament::auth()->user())->hasRole($record)) {
+                                    return $action->failureNotificationTitle(__('You cannot delete your own role.'))->failure();
+                                }
+
+                                return true;
+                            })
+                            ->map(fn (Model $record) => $record->delete())
+                        );
+
+                        if ($deleted->isNotEmpty()) {
+                            $action->success();
+                        }
+                    }),
             ]);
     }
 

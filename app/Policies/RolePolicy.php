@@ -12,20 +12,6 @@ class RolePolicy
 {
     use HandlesAuthorization;
 
-    public function before(Admin|User $user, string $ability, Role|string $role): ?bool
-    {
-        // dd($user, $ability, $role);
-        // if ($role instanceof Role && $role->isSuperAdmin()) {
-        //     return false;
-        // }
-
-        // if ($user instanceof User && $user->isOwner(Filament::getTenant())) {
-        //     return true;
-        // }
-
-        return null;
-    }
-
     /**
      * Determine whether the user can view any models.
      */

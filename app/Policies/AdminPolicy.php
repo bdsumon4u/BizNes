@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Admin;
 use App\Models\User;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AdminPolicy
@@ -40,10 +39,6 @@ class AdminPolicy
      */
     public function update(Admin|User $user, Admin $admin): bool
     {
-        // if ($admin->hasRole(Utils::getSuperAdminName())) {
-        //     return $user->hasRole(Utils::getSuperAdminName());
-        // }
-
         return $user->can('update_admin');
     }
 

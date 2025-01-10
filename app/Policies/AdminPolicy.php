@@ -40,9 +40,9 @@ class AdminPolicy
      */
     public function update(Admin|User $user, Admin $admin): bool
     {
-        if ($admin->hasRole(Utils::getSuperAdminName())) {
-            return $user->hasRole(Utils::getSuperAdminName());
-        }
+        // if ($admin->hasRole(Utils::getSuperAdminName())) {
+        //     return $user->hasRole(Utils::getSuperAdminName());
+        // }
 
         return $user->can('update_admin');
     }

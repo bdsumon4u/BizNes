@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+
+use function Pest\Laravel\seed;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,8 +16,10 @@
 */
 
 pest()->extend(Tests\TestCase::class)
+    ->use(LazilyRefreshDatabase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature')
+    ->beforeEach(fn () => seed());
 
 /*
 |--------------------------------------------------------------------------

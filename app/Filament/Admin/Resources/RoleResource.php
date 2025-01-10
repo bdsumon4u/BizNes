@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\RoleResource\Pages;
-use App\Filament\Admin\Resources\RoleResource\RelationManagers\UsersRelationManager;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
 use BezhanSalleh\FilamentShield\Support\Utils;
@@ -144,7 +143,7 @@ class RoleResource extends Resource implements HasShieldPermissions
     public static function getRelations(): array
     {
         return [
-            UsersRelationManager::class,
+            //
         ];
     }
 

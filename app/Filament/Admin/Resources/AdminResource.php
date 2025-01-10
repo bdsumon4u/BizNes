@@ -44,11 +44,10 @@ class AdminResource extends Resource
                 Forms\Components\Select::make('roles')
                     ->multiple()
                     ->relationship('roles', 'name')
-                    ->disableOptionWhen(fn (string $label) => $label === Utils::getSuperAdminName() && ! optional(Filament::auth()->user())->hasRole(Utils::getSuperAdminName()))
                     ->preload()
                     ->searchable()
-                    ->disabled(fn (?Model $record) => $record?->is(Filament::auth()->user()))
-                    ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
+                    ->hidden(fn (?Model $record) => $record?->is(Filament::auth()->user()))
+                    // ->dehydrated(false) // Must be after the `disabled` method call ***IMPORTANT***
                     ->hint(fn (?Model $record) => $record?->is(Filament::auth()->user()) ? __('You cannot change your own roles.') : null),
             ])
             ->columns(1);

@@ -9,7 +9,6 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -67,7 +66,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(function (Model $record) {
-                        if (!$record->is(Filament::auth()->user())) {
+                        if (! $record->is(Filament::auth()->user())) {
                             return $record->name;
                         }
 

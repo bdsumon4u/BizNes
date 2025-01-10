@@ -5,13 +5,15 @@ namespace App\Models;
 use Devdojo\Auth\Models\User as AuthUser;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends AuthUser implements FilamentUser
 {
-    use HasRoles, Notifiable {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, HasRoles, Notifiable {
         HasRoles::roles as spatieRoles;
     }
 

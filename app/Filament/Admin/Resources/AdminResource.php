@@ -9,6 +9,8 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -60,13 +62,20 @@ class AdminResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->suffix(fn (Model $record) => $record->is(Filament::auth()->user()) ? ' (you)' : null),
+                    ->icon(fn (Model $record) => $record->is(Filament::auth()->user()) ? 'heroicon-o-star' : null)
+                    ->iconPosition(IconPosition::After),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->icon(fn (Admin $record) => $record->hasVerifiedEmail() ? 'heroicon-o-check-badge' : null)
+                    ->iconColor(fn (Admin $record) => $record->hasVerifiedEmail() ? Color::Green : null),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->searchable()
-                    ->badge(),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        Utils::getSuperAdminName() => 'success',
+                        default => 'primary',
+                    }),
             ])
             ->filters([
                 //

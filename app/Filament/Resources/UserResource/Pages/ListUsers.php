@@ -14,6 +14,7 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
+                ->modalDescription('If there is a user with the same email address, the existing user will be used instead of creating a new one. In this case, the existing user will be assigned to the current business. And the name, password, etc. will NOT be updated.')
                 ->slideOver()
                 ->modalWidth('md'),
         ];

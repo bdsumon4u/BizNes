@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Unique;
 
 class UserResource extends Resource
 {
@@ -34,6 +35,7 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
+                    ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
@@ -43,11 +45,15 @@ class UserResource extends Resource
                     ->dehydrated(fn (?string $state) => filled($state))
                     ->required(fn (string $context): bool => $context === 'create'),
                 Forms\Components\Toggle::make('is_partner')
+                    ->saveRelationshipsUsing(function (Model $record, Forms\Get $get, Forms\Set $set) {
+                        $record->businesses()->updateExistingPivot(Filament::getTenant(), [
+                            'is_owner' => $get('is_partner'),
+                        ]);
+                    })
                     ->label(__('Partner'))
                     ->onIcon('heroicon-o-exclamation-triangle')
                     ->hintIcon('heroicon-o-exclamation-circle')
                     ->hint(__('Also an owner of this business.'))
-                    ->dehydrated(false)
                     ->formatStateUsing(fn (?Model $record) => $record?->isOwner(Filament::getTenant()))
                     ->afterStateUpdated(fn (bool $state, Forms\Set $set) => $state && $set('roles', [
                         Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
@@ -55,6 +61,7 @@ class UserResource extends Resource
                             ->firstOrFail()
                             ->getKey(),
                     ]))
+                    ->dehydrated(false)
                     ->live(),
                 Forms\Components\Select::make('roles')
                     ->multiple()

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Business::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->enum(BusinessUserStatus::cases());
             $table->boolean('is_owner')->default(false);
             $table->timestamps();
 

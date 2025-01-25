@@ -4,7 +4,11 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Hash;
 
 class ListUsers extends ListRecords
 {
@@ -14,7 +18,7 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->modalDescription('If there is a user with the same email address, the existing user will be used instead of creating a new one. In this case, the existing user will be assigned to the current business. And the name, password, etc. will NOT be updated.')
+                ->modalDescription(__('If a user with the same email exists, they will be assigned to the current business without updating their name, password, or other details.'))
                 ->slideOver()
                 ->modalWidth('md'),
         ];

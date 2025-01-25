@@ -16,7 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Unique;
+use Illuminate\Support\HtmlString;
 
 class UserResource extends Resource
 {
@@ -32,17 +32,34 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->readOnly(fn (Forms\Get $get) => $get('is_user_exists'))
+                    ->helperText(fn (Forms\Get $get) => $get('is_user_exists') ? __('This found user will be used instead of creating a new one.') : null),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->unique(ignoreRecord: true)
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->afterStateUpdated(function (?string $state, Forms\Get $get, Forms\Set $set) {
+                        $set('is_user_exists', false);
+                        if (! $typpedName = $get('typped_name')) {
+                            $set('typped_name', $get('name'));
+                        }
+                        if ($state && $user = static::getEloquentQuery()->firstWhere('email', $state)) {
+                            $set('is_user_exists', true);
+                            $set('name', $user->name);
+                        } elseif ($typpedName) {
+                            $set('name', $typpedName);
+                        }
+                    })
+                    ->helperText(fn (Forms\Get $get) => $get('is_user_exists') ? new HtmlString(__('This email address belongs to the user <strong style="color: red;">:name</strong>.', ['name' => $get('name')])) : null)
+                    ->lazy(),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->revealable()
                     ->dehydrateStateUsing(fn (string $state) => Hash::make($state))
                     ->dehydrated(fn (?string $state) => filled($state))
+                    ->hidden(fn (Forms\Get $get) => $get('is_user_exists'))
                     ->required(fn (string $context): bool => $context === 'create'),
                 Forms\Components\Toggle::make('is_partner')
                     ->saveRelationshipsUsing(function (Model $record, Forms\Get $get, Forms\Set $set) {

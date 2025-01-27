@@ -45,7 +45,7 @@ class UserResource extends Resource
                         if (! $typpedName = $get('typped_name')) {
                             $set('typped_name', $get('name'));
                         }
-                        if ($state && $user = static::getEloquentQuery()->firstWhere('email', $state)) {
+                        if ($state && $user = static::getModel()::query()->firstWhere('email', $state)) {
                             $set('is_user_exists', true);
                             $set('name', $user->name);
                         } elseif ($typpedName) {
@@ -72,12 +72,12 @@ class UserResource extends Resource
                     ->hintIcon('heroicon-o-exclamation-circle')
                     ->hint(__('Also an owner of this business.'))
                     ->formatStateUsing(fn (?Model $record) => $record?->isOwner(Filament::getTenant()))
-                    ->afterStateUpdated(fn (bool $state, Forms\Set $set) => $state && $set('roles', [
+                    ->afterStateUpdated(fn (bool $state, Forms\Set $set) => $set('roles', $state ? [
                         Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
                             ->where('name', Utils::getSuperAdminName())
                             ->firstOrFail()
                             ->getKey(),
-                    ]))
+                    ] : []))
                     ->dehydrated(false)
                     ->live(),
                 Forms\Components\Select::make('roles')
@@ -141,24 +141,6 @@ class UserResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->slideOver()
                     ->modalWidth('md'),
-                Tables\Actions\Action::make('partner')
-                    ->databaseTransaction()
-                    ->action(function (Model $record) {
-                        if (! $isOwner = $record->isOwner(Filament::getTenant())) {
-                            $record->assignRole(
-                                Utils::getRoleModel()::whereBelongsTo(Filament::getTenant())
-                                    ->where('name', Utils::getSuperAdminName())
-                                    ->firstOrFail()
-                            );
-                        }
-                        $record->businesses()->updateExistingPivot(Filament::getTenant(), [
-                            'is_owner' => ! $isOwner,
-                        ]);
-                    })
-                    ->icon(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'heroicon-o-x-circle' : 'heroicon-o-exclamation-triangle')
-                    ->color(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'danger' : 'warning')
-                    ->hidden(fn (Model $record) => $record->is(Filament::auth()->user()))
-                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

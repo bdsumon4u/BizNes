@@ -14,6 +14,7 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
@@ -112,9 +113,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->color(fn (Model $record) => $record->is(Filament::auth()->user()) ? Color::Green : null)
                     ->weight(fn (Model $record) => $record->is(Filament::auth()->user()) ? FontWeight::SemiBold : null)
-                    ->icon(fn (Model $record) => $record->isOwner(Filament::getTenant()) ? 'heroicon-o-sparkles' : null)
+                    ->icon(fn (Model $record) => $record->is(Filament::auth()->user()) ? 'heroicon-o-user-circle' : null)
                     ->iconPosition(IconPosition::After),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
@@ -125,6 +125,11 @@ class UserResource extends Resource
                     ->label(__('Businesses'))
                     ->counts('businesses')
                     ->sortable()
+                    ->badge(),
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('Type'))
+                    ->getStateUsing(fn (Model $record): string => $record->isOwner(Filament::getTenant()) ? __('Owner') : __('Employee'))
+                    ->color(fn (Model $record): string => $record->isOwner(Filament::getTenant()) ? 'success' : 'primary')
                     ->badge(),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->searchable()

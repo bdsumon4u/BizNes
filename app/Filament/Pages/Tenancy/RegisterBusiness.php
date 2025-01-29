@@ -46,7 +46,7 @@ class RegisterBusiness extends RegisterTenant
                 'name' => Utils::getSuperAdminName(),
                 Utils::getTenantModelForeignKey() => $businessId,
             ],
-            ['guard_name' => 'web']
+            ['guard_name' => Utils::getFilamentAuthGuard()]
         ), fn (Role $role) => $role->givePermissionTo(
             $this->getPermissions($businessId)
         ));
@@ -54,6 +54,6 @@ class RegisterBusiness extends RegisterTenant
 
     private function getPermissions(): array
     {
-        return Utils::getPermissionModel()::where('guard_name', 'web')->pluck('id')->toArray();
+        return Utils::getPermissionModel()::where('guard_name', Utils::getFilamentAuthGuard())->pluck('id')->toArray();
     }
 }

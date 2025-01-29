@@ -15,6 +15,16 @@ class RegisterBusiness extends RegisterTenant
 
     protected ?bool $hasDatabaseTransactions = true;
 
+    /**
+     * @var view-string
+     */
+    protected static string $layout = 'filament.components.layout.simple';
+
+    /**
+     * @var view-string
+     */
+    protected static string $view = 'filament.pages.tenancy.register-business';
+
     public static function getLabel(): string
     {
         return 'Register Business';

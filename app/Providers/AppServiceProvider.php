@@ -9,7 +9,6 @@ use Filament\Forms\Components\TextInput\Actions\HidePasswordAction;
 use Filament\Forms\Components\TextInput\Actions\ShowPasswordAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -38,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Vite::useAggressivePrefetching();
         Date::use(CarbonImmutable::class);
         DB::prohibitDestructiveCommands(app()->isProduction());
-        Model::shouldBeStrict(!app()->isProduction());
+        Model::shouldBeStrict(! app()->isProduction());
         URL::forceHttps(app()->isProduction());
         Model::unguard();
         Table::$defaultCurrency = 'bdt';

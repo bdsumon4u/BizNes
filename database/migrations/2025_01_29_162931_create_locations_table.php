@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Business::class)->constrained();
             $table->string('name');
+            $table->string('type');
             $table->text('description')->nullable();
             $table->string('street');
             $table->string('district');

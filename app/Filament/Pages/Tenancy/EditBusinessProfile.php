@@ -7,12 +7,12 @@ use Filament\Facades\Filament;
 use Filament\Pages\Tenancy\EditTenantProfile;
 use Filament\Panel;
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 
 class EditBusinessProfile extends EditTenantProfile
 {
     use BusinessForm;
+
     protected static ?string $cluster = BusinessProfile::class;
 
     protected static ?string $slug = 'profile';
@@ -40,12 +40,13 @@ class EditBusinessProfile extends EditTenantProfile
         $panel = $panel ? Filament::getPanel($panel) : Filament::getCurrentPanel();
 
         $routeName = static::getRelativeRouteName();
-                $routeName = static::prependClusterRouteBaseName($routeName);
+        $routeName = static::prependClusterRouteBaseName($routeName);
 
         return $panel->generateRouteName($routeName);
     }
 
     protected static bool $isDiscovered = true;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     // protected ?string $maxContentWidth = MaxWidth::ThreeExtraLarge->value;

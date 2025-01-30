@@ -2,11 +2,13 @@
 
 namespace App\Filament\Clusters;
 
+use App\Filament\Pages\Tenancy\EditBusinessProfile;
 use Filament\Clusters\Cluster;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Concerns\HasRoutes;
 use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Pages\Tenancy\EditTenantProfile;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,9 +16,11 @@ use function Filament\authorize;
 
 class BusinessProfile extends Cluster
 {
-    use HasRoutes, InteractsWithForms, InteractsWithFormActions;
+    use HasRoutes;
+    use InteractsWithFormActions;
+    use InteractsWithForms;
+
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
-    protected static string $view = 'filament.pages.test-page';
 
     public static function getLabel(): string
     {
@@ -32,7 +36,12 @@ class BusinessProfile extends Cluster
     {
         $panel = $panel ? Filament::getPanel($panel) : Filament::getCurrentPanel();
 
-        return $panel->generateRouteName('tenant.' . static::getRelativeRouteName());
+        return $panel->generateRouteName('tenant.'.static::getRelativeRouteName());
+    }
+
+    public function getView(): string
+    {
+        return (string) EditBusinessProfile::$view;
     }
 
     public static function canView(Model $tenant): bool

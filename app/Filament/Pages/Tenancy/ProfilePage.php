@@ -71,4 +71,11 @@ class ProfilePage extends EditTenantProfile
     {
         return static::getNavigationLabel();
     }
+
+    protected function getFormActions(): array
+    {
+        return [
+            //
+        ];
+    }
 }

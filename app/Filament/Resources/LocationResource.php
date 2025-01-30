@@ -24,7 +24,7 @@ class LocationResource extends Resource
     {
         return $form
             ->schema([
-                //
+                
             ]);
     }
 

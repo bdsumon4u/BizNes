@@ -9,7 +9,7 @@ use Filament\Panel;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Route;
 
-class EditBusinessProfile extends EditTenantProfile
+class ProfilePage extends EditTenantProfile
 {
     use BusinessForm;
 
@@ -17,9 +17,31 @@ class EditBusinessProfile extends EditTenantProfile
 
     protected static ?string $slug = 'profile';
 
-    public static function getRelativeRouteName(): string
+    protected static bool $isDiscovered = true;
+
+    protected static ?string $navigationLabel = 'Profile';
+
+    protected static ?string $navigationIcon = 'ri-profile-line';
+
+    public static function getBreadcrumb(): string
     {
-        return (string) str(static::getSlug())->replace('/', '.');
+        return static::$breadcrumb ?? static::getLabel();
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getBreadcrumbs(): array
+    {
+        $breadcrumbs = [
+            ...(filled($breadcrumb = $this->getBreadcrumb()) ? [$breadcrumb] : []),
+        ];
+
+        if (filled($cluster = static::getCluster())) {
+            return $cluster::unshiftClusterBreadcrumbs($breadcrumbs);
+        }
+
+        return $breadcrumbs;
     }
 
     public static function registerRoutes(Panel $panel): void
@@ -45,12 +67,8 @@ class EditBusinessProfile extends EditTenantProfile
         return $panel->generateRouteName($routeName);
     }
 
-    protected static bool $isDiscovered = true;
-
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
     public static function getLabel(): string
     {
-        return 'Business Profile ds';
+        return static::getNavigationLabel();
     }
 }

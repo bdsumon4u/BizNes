@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Tenancy;
 
 use App\Filament\Pages\Tenancy\EditBusinessProfile;
+use App\Filament\Pages\Tenancy\ProfilePage;
 use Filament\Clusters\Cluster;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -29,7 +30,7 @@ class BusinessSettings extends Cluster
 
     public static function getSlug(): string
     {
-        return 'tenant';
+        return 'settings';
     }
 
     public static function getRelativeRouteName(): string
@@ -46,7 +47,7 @@ class BusinessSettings extends Cluster
 
     public function getView(): string
     {
-        return (string) EditBusinessProfile::$view;
+        return (string) ProfilePage::$view;
     }
 
     public static function canView(Model $tenant): bool

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Tenancy;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Wizard;
@@ -17,6 +18,7 @@ trait BusinessForm
         return $form
             ->schema([
                 Wizard::make([
+                    // General Step
                     Wizard\Step::make('General')
                         ->schema([
                             TextInput::make('name')
@@ -42,6 +44,23 @@ trait BusinessForm
                                 ->columnSpanFull(),
                         ])
                         ->columns(2),
+
+                    // Branding Step
+                    Wizard\Step::make('Branding')
+                        ->schema([
+                            FileUpload::make('logo')
+                                ->image()
+                                ->directory('business/logos')
+                                ->maxSize(512),
+                            FileUpload::make('favicon')
+                                ->image()
+                                ->directory('business/favicons')
+                                ->maxSize(512),
+                        ])
+                        ->visibleOn('edit')
+                        ->columns(2),
+
+                    // Location Step
                     Wizard\Step::make('Location')
                         ->schema([
                             Textarea::make('street')
@@ -57,6 +76,8 @@ trait BusinessForm
                         ])
                         ->hiddenOn('edit')
                         ->columns(2),
+
+                    // Social Media Step
                     Wizard\Step::make('Social Media')
                         ->schema([
                             TextInput::make('facebook')
@@ -77,14 +98,20 @@ trait BusinessForm
                             TextInput::make('tiktok')
                                 ->label('TikTok')
                                 ->prefixIcon('ri-tiktok-line')
-                                ->placeholder('https://tiktok.com/username')
+                                ->placeholder('https://tiktok.com/@username')
                                 ->url(),
                             TextInput::make('youtube')
                                 ->label('YouTube')
                                 ->prefixIcon('ri-youtube-line')
                                 ->placeholder('https://youtube.com/channel/username')
                                 ->url(),
-                        ]),
+                            TextInput::make('linkedin')
+                                ->label('LinkedIn')
+                                ->prefixIcon('ri-linkedin-line')
+                                ->placeholder('https://linkedin.com/in/username')
+                                ->url(),
+                        ])
+                        ->columns(2),
                 ])
                     ->extraAlpineAttributes([
                         'x-on:keydown.enter.prevent' => '

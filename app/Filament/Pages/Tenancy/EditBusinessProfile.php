@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages\Tenancy;
 
-use App\Filament\Clusters\BusinessProfile;
+use App\Filament\Clusters\Tenancy\BusinessSettings;
 use Filament\Facades\Filament;
 use Filament\Pages\Tenancy\EditTenantProfile;
 use Filament\Panel;
@@ -13,7 +13,7 @@ class EditBusinessProfile extends EditTenantProfile
 {
     use BusinessForm;
 
-    protected static ?string $cluster = BusinessProfile::class;
+    protected static ?string $cluster = BusinessSettings::class;
 
     protected static ?string $slug = 'profile';
 
@@ -48,8 +48,6 @@ class EditBusinessProfile extends EditTenantProfile
     protected static bool $isDiscovered = true;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
-    // protected ?string $maxContentWidth = MaxWidth::ThreeExtraLarge->value;
 
     public static function getLabel(): string
     {

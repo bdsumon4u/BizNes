@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\BusinessProfile;
+use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
 use Filament\Forms\Form;
@@ -12,7 +12,7 @@ use Filament\Tables\Table;
 
 class LocationResource extends Resource
 {
-    protected static ?string $cluster = BusinessProfile::class;
+    protected static ?string $cluster = BusinessSettings::class;
 
     protected static ?string $model = Location::class;
 

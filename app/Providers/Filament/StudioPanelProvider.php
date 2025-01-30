@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Clusters\BusinessProfile;
+use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Pages\Tenancy\RegisterBusiness;
 use App\Models\Business;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -80,7 +80,7 @@ class StudioPanelProvider extends PanelProvider
                 }),
             ])
             ->tenantRegistration(RegisterBusiness::class)
-            ->tenantProfile(BusinessProfile::class)
+            ->tenantProfile(BusinessSettings::class)
             ->viteTheme('resources/css/filament/studio/theme.css')
             ->spa();
     }

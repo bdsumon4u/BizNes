@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Clusters;
+namespace App\Filament\Clusters\Tenancy;
 
 use App\Filament\Pages\Tenancy\EditBusinessProfile;
 use Filament\Clusters\Cluster;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use function Filament\authorize;
 
-class BusinessProfile extends Cluster
+class BusinessSettings extends Cluster
 {
     use HasRoutes;
     use InteractsWithFormActions;
@@ -24,7 +24,12 @@ class BusinessProfile extends Cluster
 
     public static function getLabel(): string
     {
-        return 'Business Profile ds';
+        return 'Business Settings';
+    }
+
+    public static function getSlug(): string
+    {
+        return 'tenant';
     }
 
     public static function getRelativeRouteName(): string

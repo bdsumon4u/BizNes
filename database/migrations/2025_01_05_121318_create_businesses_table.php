@@ -24,9 +24,6 @@ return new class extends Migration
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();
-            $table->string('street');
-            $table->string('district');
-            $table->string('city');
             $table->string('facebook')->nullable();
             $table->string('twitter')->nullable();
             $table->string('instagram')->nullable();

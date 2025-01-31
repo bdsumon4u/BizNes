@@ -2,12 +2,14 @@
 
 namespace App\Filament\Pages\Tenancy;
 
+use App\LocationType;
 use App\Models\Business;
 use App\Models\Role;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Facades\Filament;
 use Filament\Pages\Tenancy\RegisterTenant;
+use Illuminate\Support\Arr;
 
 class RegisterBusiness extends RegisterTenant
 {
@@ -32,8 +34,16 @@ class RegisterBusiness extends RegisterTenant
 
     protected function handleRegistration(array $data): Business
     {
-        $business = Business::query()->create($data);
+        $location = ['street', 'district', 'city'];
+        $business = Business::query()->create(Arr::except($data, $location));
         $business->users()->attach(Filament::auth()->user(), ['is_owner' => true]);
+        $business->locations()->create(Arr::only($data, $location) + [
+            'name' => 'Main',
+            'type' => LocationType::HYBRID,
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'is_main' => true,
+        ]);
 
         // temporary: get session team_id for restore at end
         $session_team_id = getPermissionsTeamId();

@@ -71,6 +71,7 @@ trait BusinessForm
                             Textarea::make('street')
                                 ->label('Street Address')
                                 ->minLength(10)
+                                ->maxLength(255)
                                 ->required()
                                 ->columnSpanFull(),
                             TextInput::make('district')

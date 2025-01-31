@@ -41,7 +41,7 @@ class StudioPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->font('Roboto', provider: GoogleFontProvider::class)
-            ->favicon(fn () => ($favicon = Filament::getTenant()?->favicon) ? Storage::url($favicon) : null)
+            ->favicon(fn () => Filament::getTenant()?->getFilamentAvatarUrl())
             ->globalSearch()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()

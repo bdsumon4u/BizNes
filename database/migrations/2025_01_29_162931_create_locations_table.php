@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->boolean('is_main')->default(false);
             $table->timestamps();
+
+            $table->unique(['business_id', 'name']);
         });
     }
 

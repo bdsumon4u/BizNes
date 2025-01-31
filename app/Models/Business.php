@@ -25,7 +25,7 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->favicon ? Storage::url($this->favicon) : null;
+        return isset($this->favicon) ? Storage::url($this->favicon) : null;
     }
 
     public function users(): BelongsToMany
@@ -41,6 +41,11 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
     public function roles(): HasMany
     {
         return $this->hasMany(Role::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(Location::class);
     }
 
     public function getCurrentTenantLabel(): string

@@ -42,14 +42,14 @@ class UserResource extends Resource
                     ->maxLength(255)
                     ->afterStateUpdated(function (?string $state, Forms\Get $get, Forms\Set $set) {
                         $set('is_user_exists', false);
-                        if (! $typpedName = $get('typped_name')) {
-                            $set('typped_name', $get('name'));
+                        if (! $typedName = $get('typed_name')) {
+                            $set('typed_name', $get('name'));
                         }
                         if ($state && $user = static::getModel()::query()->firstWhere('email', $state)) {
                             $set('is_user_exists', true);
                             $set('name', $user->name);
-                        } elseif ($typpedName) {
-                            $set('name', $typpedName);
+                        } elseif ($typedName) {
+                            $set('name', $typedName);
                         }
                     })
                     ->helperText(fn (Forms\Get $get) => $get('is_user_exists') ? new HtmlString(__('This email address belongs to the user <strong style="color: red;">:name</strong>.', ['name' => $get('name')])) : null)

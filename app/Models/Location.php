@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\LocationType;
+use App\Enum\LocationType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,10 +20,6 @@ class Location extends Model
         ];
     }
 
-    public function business(): BelongsTo
-    {
-        return $this->belongsTo(Business::class);
-    }
 
     public function users(): BelongsToMany
     {

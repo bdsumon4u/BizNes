@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages\Tenancy;
 
-use App\LocationType;
+use App\Enum\LocationType;
 use App\Models\Business;
 use App\Models\Role;
 use App\Models\User;

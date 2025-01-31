@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Filament\Resources\LocationResource\RelationManagers\UsersRelationManager;
-use App\LocationType;
+use App\Enum\LocationType;
 use App\Models\Location;
 use Filament\Forms;
 use Filament\Forms\Form;

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Enum\Dimension\Length;
+use App\Enum\Dimension\Volume;
+use App\Enum\Dimension\Weight;
 use App\Models\Permission;
 use App\Models\Role;
 use Carbon\CarbonImmutable;
@@ -9,6 +12,7 @@ use Filament\Forms\Components\TextInput\Actions\HidePasswordAction;
 use Filament\Forms\Components\TextInput\Actions\ShowPasswordAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -51,5 +55,44 @@ class AppServiceProvider extends ServiceProvider
         HidePasswordAction::configureUsing(function (HidePasswordAction $action) {
             return $action->extraAttributes(['tabindex' => '-1']);
         });
+
+        $this->registerBlueprintMacros();
+    }
+
+    private function registerBlueprintMacros()
+    {
+        Blueprint::macro('seo_v1', function (Blueprint $table) {
+            $table->string('meta_title')->nullable();
+            $table->string('meta_description')->nullable();
+            $table->json('meta_keywords')->nullable();
+            $table->string('og_title')->nullable();
+            $table->text('og_description')->nullable();
+            $table->json('metadata')->nullable();
+        });
+
+        Blueprint::macro('shipping_v1', function (Blueprint $table) {
+            $table->string('weight_unit')->default(Weight::KG());
+            $table->decimal('weight_value', 10)->nullable()
+                ->default(0.00)
+                ->unsigned();
+            $table->string('height_unit')->default(Length::CM());
+            $table->decimal('height_value', 10)->nullable()
+                ->default(0.00)
+                ->unsigned();
+            $table->string('width_unit')->default(Length::CM());
+            $table->decimal('width_value', 10)->nullable()
+                ->default(0.00)
+                ->unsigned();
+            $table->string('depth_unit')->default(Length::CM());
+            $table->decimal('depth_value', 10)->nullable()
+                ->default(0.00)
+                ->unsigned();
+            $table->string('volume_unit')->default(Volume::L());
+            $table->decimal('volume_value', 10)->nullable()
+                ->default(0.00)
+                ->unsigned();
+        });
+
+        // dropLayer_vNext
     }
 }

@@ -22,6 +22,7 @@ use Filament\Widgets;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
@@ -85,5 +86,10 @@ class StudioPanelProvider extends PanelProvider
             ->tenantProfile(BusinessSettings::class)
             ->viteTheme('resources/css/filament/studio/theme.css')
             ->spa();
+    }
+
+    public function boot(): void
+    {
+        Model::resolveRelationUsing('business', fn (Model $model) => $model->belongsTo(Business::class, (new Business)->getForeignKey()));
     }
 }

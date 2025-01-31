@@ -6,7 +6,6 @@ use App\Filament\Clusters\Tenancy\BusinessSettings;
 use Filament\Facades\Filament;
 use Filament\Pages\Tenancy\EditTenantProfile;
 use Filament\Panel;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Route;
 
 class ProfilePage extends EditTenantProfile

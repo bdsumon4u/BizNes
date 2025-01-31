@@ -6,7 +6,6 @@ use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
 use App\LocationType;
 use App\Models\Location;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -104,7 +103,7 @@ class LocationResource extends Resource
                         if ($data['is_main'] ?? false) {
                             static::getEloquentQuery()->update(['is_main' => false]);
                         }
-                        
+
                         $location->update($data);
                     })),
             ])

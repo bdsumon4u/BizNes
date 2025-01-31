@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\LocationResource\Pages;
 
 use App\Filament\Resources\LocationResource;
-use App\LocationType;
 use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\ListRecords;

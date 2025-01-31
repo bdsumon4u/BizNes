@@ -2,14 +2,12 @@
 
 namespace App\Filament\Clusters\Tenancy;
 
-use App\Filament\Pages\Tenancy\EditBusinessProfile;
 use App\Filament\Pages\Tenancy\ProfilePage;
 use Filament\Clusters\Cluster;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Concerns\HasRoutes;
 use Filament\Pages\Concerns\InteractsWithFormActions;
-use Filament\Pages\Tenancy\EditTenantProfile;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 

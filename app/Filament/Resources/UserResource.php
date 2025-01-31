@@ -64,7 +64,7 @@ class UserResource extends Resource
                 Forms\Components\Toggle::make('is_partner')
                     ->saveRelationshipsUsing(function (Model $record, Forms\Get $get, Forms\Set $set) {
                         $record->businesses()->updateExistingPivot(Filament::getTenant(), [
-                            'is_owner' => $get('is_partner'),
+                            'is_owner' => $get('is_partner') ?? false,
                         ]);
                     })
                     ->label(__('Partner'))

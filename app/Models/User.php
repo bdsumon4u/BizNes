@@ -76,6 +76,11 @@ class User extends AuthUser implements FilamentUser, HasTenants
         return $this->spatieRoles()->where('guard_name', 'web');
     }
 
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(Location::class);
+    }
+
     public function getTenants(Panel $panel): Collection
     {
         return $this->businesses;

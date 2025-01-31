@@ -40,7 +40,7 @@ return new class extends Migration
             $table->boolean('is_owner')->default(false);
             $table->timestamps();
 
-            $table->unique(['business_id', 'user_id']);
+            $table->unique([(new Business)->getForeignKey(), (new User)->getForeignKey()]);
         });
     }
 

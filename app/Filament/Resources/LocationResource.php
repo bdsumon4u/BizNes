@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
+use App\Filament\Resources\LocationResource\RelationManagers\UsersRelationManager;
 use App\LocationType;
 use App\Models\Location;
 use Filament\Forms;
@@ -91,21 +92,26 @@ class LocationResource extends Resource
                 TextColumn::make('phone')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('users_count')
+                    ->label(__('Users'))
+                    ->counts('users')
+                    ->sortable()
+                    ->badge(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->slideOver()
-                    ->modalWidth('md')
-                    ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
-                        if ($data['is_main'] ?? false) {
-                            static::getEloquentQuery()->update(['is_main' => false]);
-                        }
+                Tables\Actions\EditAction::make(),
+                    // ->slideOver()
+                    // ->modalWidth('md')
+                    // ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
+                    //     if ($data['is_main'] ?? false) {
+                    //         static::getEloquentQuery()->update(['is_main' => false]);
+                    //     }
 
-                        $location->update($data);
-                    })),
+                    //     $location->update($data);
+                    // })),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -117,7 +123,7 @@ class LocationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UsersRelationManager::class,
         ];
     }
 
@@ -126,7 +132,7 @@ class LocationResource extends Resource
         return [
             'index' => Pages\ListLocations::route('/'),
             // 'create' => Pages\CreateLocation::route('/create'),
-            // 'edit' => Pages\EditLocation::route('/{record}/edit'),
+            'edit' => Pages\EditLocation::route('/{record}/edit'),
         ];
     }
 }

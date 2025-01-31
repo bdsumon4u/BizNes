@@ -8,6 +8,7 @@ use App\Models\Business;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use Filament\Facades\Filament;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -24,6 +25,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class StudioPanelProvider extends PanelProvider
@@ -38,7 +40,8 @@ class StudioPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->font('Roboto')
+            ->font('Roboto', provider: GoogleFontProvider::class)
+            ->favicon(fn () => ($favicon = Filament::getTenant()?->favicon) ? Storage::url($favicon) : null)
             ->globalSearch()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()

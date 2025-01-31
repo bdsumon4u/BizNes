@@ -62,7 +62,7 @@
             </div>
             <div class="relative flex w-full h-full bg-white shadow-xl rounded-tl-2xl dark:bg-gray-900">
                 <div class="p-8">
-                    Brand
+                    <img src="{{ asset('imgs/icon.svg') }}" alt="Brand" class="size-10" />
                 </div>
                 <div
                     class="flex-1 pl-4 border-l border-gray-100 divide-y divide-gray-100 dark:divide-white/10 dark:border-white/10"
@@ -73,16 +73,7 @@
                         </h2>
                     </div>
                     <div class="px-5 py-8 space-y-16">
-                        <div class="flex items-center space-x-3">
-                            Home
-                            <span class="h-3.5 w-1/2 animate-pulse rounded-full bg-gray-100 dark:bg-gray-800"></span>
-                        </div>
                         <div>
-                            <h5
-                                class="text-xs font-medium leading-5 tracking-wider text-gray-500 uppercase dark:text-gray-400"
-                            >
-                                {{ __('shopper::layout.sidebar.catalog') }}
-                            </h5>
                             <ul class="mt-5 space-y-8">
                                 @foreach (range(0, 8) as $value)
                                     <li class="flex items-center space-x-2 animate-pulse">

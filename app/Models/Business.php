@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use Filament\Facades\Filament;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasCurrentTenantLabel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class Business extends Model implements HasCurrentTenantLabel
+class Business extends Model implements HasAvatar, HasCurrentTenantLabel
 {
     protected $guarded = ['id'];
 
@@ -18,6 +21,11 @@ class Business extends Model implements HasCurrentTenantLabel
         static::creating(function (Business $business) {
             $business->uuid = Str::uuid();
         });
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->favicon ? Storage::url($this->favicon) : null;
     }
 
     public function users(): BelongsToMany

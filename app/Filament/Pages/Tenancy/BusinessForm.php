@@ -29,6 +29,7 @@ trait BusinessForm
                             PhoneInput::make('phone')
                                 ->label('Business Phone')
                                 ->required()
+                                ->disallowDropdown()
                                 ->defaultCountry('BD')
                                 ->initialCountry('BD')
                                 ->unique(ignoreRecord: true),
@@ -40,6 +41,7 @@ trait BusinessForm
                                 ->prefixIcon('heroicon-o-envelope')
                                 ->columnSpanFull(),
                             Textarea::make('about')
+                                ->minLength(50)
                                 ->hint('Tell us about your business.')
                                 ->columnSpanFull(),
                         ])
@@ -54,6 +56,9 @@ trait BusinessForm
                                 ->maxSize(512),
                             FileUpload::make('favicon')
                                 ->image()
+                                ->imageResizeMode('force')
+                                ->imageResizeTargetHeight(48)
+                                ->imageResizeTargetWidth(48)
                                 ->directory('business/favicons')
                                 ->maxSize(512),
                         ])
@@ -65,6 +70,7 @@ trait BusinessForm
                         ->schema([
                             Textarea::make('street')
                                 ->label('Street Address')
+                                ->minLength(10)
                                 ->required()
                                 ->columnSpanFull(),
                             TextInput::make('district')

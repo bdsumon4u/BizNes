@@ -2,9 +2,9 @@
 
 namespace App\Forms\Components;
 
-use Filament\Forms\Components\Field;
 use Filament\Forms;
-use Filament\Forms\Set;
+use Filament\Forms\Components\Field;
+use Illuminate\Database\Eloquent\Model;
 
 class SEOField extends Field
 {
@@ -39,6 +39,11 @@ class SEOField extends Field
                             ->reorderable(),
                     ]),
             ])
-            ->columnSpanFull();
+            ->columnSpanFull()
+            ->formatStateUsing(
+                fn (SEOField $seoField, Model $record) => collect($seoField->getContainer()->getStateOnly([$name])[$name])
+                    ->map(fn ($value, $key) => $record->getAttribute($key))
+                    ->toArray()
+            );
     }
 }

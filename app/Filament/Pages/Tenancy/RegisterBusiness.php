@@ -38,7 +38,7 @@ class RegisterBusiness extends RegisterTenant
         $business = Business::query()->create(Arr::except($data, $location));
         $business->users()->attach(Filament::auth()->user(), ['is_owner' => true]);
         $business->locations()->create(Arr::only($data, $location) + [
-            'name' => 'Main',
+            'name' => __('Main'),
             'type' => LocationType::HYBRID,
             'email' => $data['email'],
             'phone' => $data['phone'],

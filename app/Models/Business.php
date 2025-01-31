@@ -52,6 +52,11 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
         return $this->hasMany(Brand::class);
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
     public function getCurrentTenantLabel(): string
     {
         if (optional(Filament::auth()->user())->isOwner($this)) {

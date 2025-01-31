@@ -2,20 +2,20 @@
 
 namespace App\Traits;
 
-use BackedEnum;
 use App\Exceptions\UndefinedEnumCaseError;
+use BackedEnum;
 
 /**
  * @mixin BackedEnum
  */
 trait HasEnumStaticMethods
 {
-    public function __invoke(): int | string
+    public function __invoke(): int|string
     {
         return $this->value;
     }
 
-    public static function __callStatic(string $name, mixed $args): int | string
+    public static function __callStatic(string $name, mixed $args): int|string
     {
         $cases = static::cases();
 

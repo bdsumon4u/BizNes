@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\LocationType;
 use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Filament\Resources\LocationResource\RelationManagers\UsersRelationManager;
-use App\Enum\LocationType;
 use App\Models\Location;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -103,15 +103,15 @@ class LocationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                    // ->slideOver()
-                    // ->modalWidth('md')
-                    // ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
-                    //     if ($data['is_main'] ?? false) {
-                    //         static::getEloquentQuery()->update(['is_main' => false]);
-                    //     }
+                // ->slideOver()
+                // ->modalWidth('md')
+                // ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
+                //     if ($data['is_main'] ?? false) {
+                //         static::getEloquentQuery()->update(['is_main' => false]);
+                //     }
 
-                    //     $location->update($data);
-                    // })),
+                //     $location->update($data);
+                // })),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

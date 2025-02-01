@@ -14,7 +14,69 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('business_id')->constrained();
+            $table->string('external_id')->nullable();
+            $table->string('name');
+            $table->string('slug')->nullable();
+            $table->string('sku')->nullable();
+            $table->string('barcode')->nullable();
+            $table->longText('description')->nullable();
+            $table->text('summary')->nullable();
+            $table->integer('security_stock')->default(0);
+            $table->boolean('is_featured')->default(false);
+            $table->boolean('is_visible')->default(false);
+            $table->string('type')->nullable();
+
+            $table->shipping_v1($table);
+            $table->seo_v1($table);
+
+            $table->timestamp('published_at')->useCurrent();
             $table->timestamps();
+            
+            foreach (['slug', 'sku', 'barcode'] as $column) {
+                $table->unique(['business_id', $column]);
+            }
+        });
+
+        Schema::create('variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('business_id')->constrained();
+            $table->foreignId('product_id')->constrained();
+            $table->string('name');
+            $table->string('slug')->nullable();
+            $table->string('sku')->nullable();
+            $table->string('barcode')->nullable();
+            $table->string('ean')->nullable();
+            $table->string('upc')->nullable();
+            $table->boolean('allow_backorder')->default(false);
+            $table->unsignedInteger('position')->default(0);
+
+            $table->shipping_v1($table);
+            $table->json('metadata')->nullable();
+
+            $table->timestamps();
+            
+            foreach (['slug', 'sku', 'barcode', 'ean', 'upc'] as $column) {
+                $table->unique(['business_id', $column]);
+            }
+        });
+
+        Schema::create('product_has_relations', function (Blueprint $table): void {
+            $table->foreignId('product_id')->constrained();
+            $table->morphs('productable');
+        });
+
+        Schema::create('attribute_product', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('attribute_id')->constrained();
+            $table->foreignId('product_id')->constrained();
+            $table->foreignId('option_id')->constrained()->nullable();
+            $table->text('value')->nullable();
+        });
+
+        Schema::create('option_variant', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('option_id')->constrained();
+            $table->foreignId('variant_id')->constrained();
         });
     }
 
@@ -23,6 +85,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('option_variant');
+        Schema::dropIfExists('attribute_product');
+        Schema::dropIfExists('product_has_relations');
+        Schema::dropIfExists('variants');
         Schema::dropIfExists('products');
     }
 };

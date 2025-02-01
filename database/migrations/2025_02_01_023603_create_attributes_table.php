@@ -32,7 +32,7 @@ return new class extends Migration
             $table->foreignId('attribute_id')->constrained();
             $table->string('key');
             $table->string('value', 50);
-            $table->unsignedSmallInteger('position')->nullable()->default(0);
+            $table->unsignedSmallInteger('position')->default(0);
 
             $table->unique(['attribute_id', 'key']);
         });

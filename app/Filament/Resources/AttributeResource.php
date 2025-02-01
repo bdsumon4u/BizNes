@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Enum\FieldType;
 use App\Filament\Resources\AttributeResource\Pages;
+use App\Filament\Resources\AttributeResource\Pages\ManageOptions;
+use App\Filament\Resources\AttributeResource\RelationManagers\OptionsRelationManager;
 use App\Forms\Components\IconPicker;
 use App\Models\Attribute;
 use Filament\Facades\Filament;
@@ -12,6 +14,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -108,10 +111,10 @@ class AttributeResource extends Resource
                     ->label(__('forms.label.is_filterable')),
             ])
             ->actions([
-                Tables\Actions\Action::make('options')
-                    ->label(__('Options'))
+                Action::make('options')
                     ->color('gray')
                     ->icon('untitledui-dotpoints')
+                    ->url(fn (Attribute $record) => static::getUrl('options', ['record' => $record]))
                     ->visible(fn (Attribute $record) => in_array($record->type, Attribute::fieldsWithOptions())),
                 Tables\Actions\EditAction::make()
                     ->slideOver()
@@ -123,7 +126,7 @@ class AttributeResource extends Resource
                         ->label(__('forms.actions.enable'))
                         ->icon('untitledui-check-verified')
                         ->action(function (Collection $records): void {
-                            $records->each->updateStatus(); // @phpstan-ignore-line
+                            $records->each->update(['is_enabled' => true]);
 
                             Notification::make()
                                 ->title(
@@ -139,7 +142,7 @@ class AttributeResource extends Resource
                         ->label(__('forms.actions.disable'))
                         ->icon('untitledui-slash-circle-01')
                         ->action(function (Collection $records): void {
-                            $records->each->updateStatus(status: false); // @phpstan-ignore-line
+                            $records->each->update(['is_enabled' => false]);
 
                             Notification::make()
                                 ->title(__('components.tables.status.updated'))
@@ -160,7 +163,7 @@ class AttributeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            OptionsRelationManager::class,
         ];
     }
 
@@ -170,6 +173,7 @@ class AttributeResource extends Resource
             'index' => Pages\ListAttributes::route('/'),
             // 'create' => Pages\CreateAttribute::route('/create'),
             // 'edit' => Pages\EditAttribute::route('/{record}/edit'),
+            'options' => ManageOptions::route('/{record}/options'),
         ];
     }
 }

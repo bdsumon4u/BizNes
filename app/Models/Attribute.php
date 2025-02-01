@@ -6,6 +6,7 @@ use App\Enum\FieldType;
 use Illuminate\Database\Eloquent\Casts\Attribute as CastsAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Attribute extends Model
 {
@@ -61,5 +62,10 @@ class Attribute extends Model
             FieldType::RichText,
             FieldType::DatePicker,
         ]);
+    }
+
+    public function options(): HasMany
+    {
+        return $this->hasMany(Option::class);
     }
 }

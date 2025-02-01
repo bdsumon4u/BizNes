@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Enum\FieldType;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Filament\Resources\AttributeResource\Pages\ManageOptions;
-use App\Filament\Resources\AttributeResource\RelationManagers\OptionsRelationManager;
 use App\Forms\Components\IconPicker;
 use App\Models\Attribute;
 use Filament\Facades\Filament;
@@ -17,6 +16,8 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class AttributeResource extends Resource
@@ -42,7 +43,7 @@ class AttributeResource extends Resource
                     ->label(__('forms.label.slug'))
                     ->required()
                     ->maxLength(255)
-                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule) => $rule->where('business_id', Filament::getTenant())),
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule) => $rule->where('business_id', Filament::getTenant()->getKey())),
 
                 Forms\Components\Select::make('type')
                     ->label(__('forms.label.type'))
@@ -61,6 +62,7 @@ class AttributeResource extends Resource
 
                 Forms\Components\Toggle::make('is_enabled')
                     ->label(__('forms.actions.enable'))
+                    ->default(true)
                     ->onColor('success')
                     ->helperText(__('Set attribute visibility for the customers.')),
 
@@ -114,8 +116,20 @@ class AttributeResource extends Resource
                 Action::make('options')
                     ->color('gray')
                     ->icon('untitledui-dotpoints')
-                    ->url(fn (Attribute $record) => static::getUrl('options', ['record' => $record]))
-                    ->visible(fn (Attribute $record) => in_array($record->type, Attribute::fieldsWithOptions())),
+                    ->modalContent(fn (Attribute $record) => new HtmlString(
+                        Blade::render('@livewire('.ManageOptions::class.'::class, [
+                            \'record\' => '.$record->getKey().',
+                        ])')
+                    ))
+                    ->visible(fn (Attribute $record) => in_array($record->type, Attribute::fieldsWithOptions()))
+                    ->slideOver()
+                    ->modalWidth('xl')
+                    ->modalHeading(fn (Attribute $record) => new HtmlString(
+                        Blade::render('<div class="flex">'.__('Attribute Options').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
+                    ))
+                    ->modalDescription(new HtmlString(__('Add common options for this attribute.<br>These options will be available on product attributes tabs.')))
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false),
                 Tables\Actions\EditAction::make()
                     ->slideOver()
                     ->modalWidth('md'),
@@ -163,7 +177,7 @@ class AttributeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            OptionsRelationManager::class,
+            //
         ];
     }
 
@@ -173,7 +187,7 @@ class AttributeResource extends Resource
             'index' => Pages\ListAttributes::route('/'),
             // 'create' => Pages\CreateAttribute::route('/create'),
             // 'edit' => Pages\EditAttribute::route('/{record}/edit'),
-            'options' => ManageOptions::route('/{record}/options'),
+            // 'options' => ManageOptions::route('/{record}/options'),
         ];
     }
 }

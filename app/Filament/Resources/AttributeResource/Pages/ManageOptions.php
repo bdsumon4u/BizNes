@@ -12,6 +12,7 @@ use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 
 class ManageOptions extends ManageRelatedRecords
 {
@@ -26,6 +27,16 @@ class ManageOptions extends ManageRelatedRecords
         return 'Options';
     }
 
+    public function getHeading(): string
+    {
+        return '';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     public function form(Form $form): Form
     {
         return $form
@@ -34,12 +45,16 @@ class ManageOptions extends ManageRelatedRecords
                     ->label(__('forms.label.value'))
                     ->placeholder('My value')
                     ->maxLength(75)
-                    ->required(),
+                    ->required()
+                    ->live(true, condition: fn (): bool => $this->getOwnerRecord()->type !== FieldType::ColorPicker)
+                    ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                        $set('key', Str::slug($state, language: config('app.locale', 'en')));
+                    }),
                 OptionKeyInput::make('key', $this->getOwnerRecord()->type)
                     ->label(__('forms.label.key'))
                     ->helperText(__('The key will be used for the values in storage for the forms (option, radio, etc.). Must be in slug format'))
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true, modifyRuleUsing: fn ($rule) => $rule->where('attribute_id', $this->getOwnerRecord()->getKey())),
             ])
             ->columns(1);
     }

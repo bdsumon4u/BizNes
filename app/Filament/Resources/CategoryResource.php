@@ -52,7 +52,7 @@ class CategoryResource extends Resource
                             ->default(false)
                             ->dehydrated(false),
                         Forms\Components\TextInput::make('slug')
-                            ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule) => $rule->where('business_id', Filament::getTenant()))
+                            ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule) => $rule->where('business_id', Filament::getTenant()->getKey()))
                             ->afterStateUpdated(function (Set $set): void {
                                 $set('is_slug_changed_manually', true);
                             })

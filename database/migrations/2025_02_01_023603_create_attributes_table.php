@@ -30,7 +30,7 @@ return new class extends Migration
         Schema::create('options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id')->constrained();
-            $table->string('key')->unique();
+            $table->string('key');
             $table->string('value', 50);
             $table->unsignedSmallInteger('position')->nullable()->default(0);
 

@@ -115,9 +115,8 @@ class LocationResource extends Resource
                     ->slideOver()
                     ->modalWidth('md')
                     ->modalHeading(fn (Location $record) => new HtmlString(
-                        Blade::render('<div class="flex">'.__('Location Users').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
+                        Blade::render('<div class="flex">'.__('Manage Users').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
                     ))
-                    ->modalDescription(fn (Location $record) => __('Manage users for :name.', ['name' => $record->name]))
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false),
                 Tables\Actions\EditAction::make()

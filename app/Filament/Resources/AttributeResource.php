@@ -124,7 +124,7 @@ class AttributeResource extends Resource
                     ->slideOver()
                     ->modalWidth('xl')
                     ->modalHeading(fn (Attribute $record) => new HtmlString(
-                        Blade::render('<div class="flex">'.__('Attribute Options').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
+                        Blade::render('<div class="flex">'.__('Manage Options').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
                     ))
                     ->modalDescription(new HtmlString(__('Add common options for this attribute.<br>These options will be available on product attributes tabs.')))
                     ->modalSubmitAction(false)

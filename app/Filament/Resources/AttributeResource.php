@@ -13,7 +13,6 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
@@ -113,7 +112,7 @@ class AttributeResource extends Resource
                     ->label(__('forms.label.is_filterable')),
             ])
             ->actions([
-                Action::make('options')
+                Tables\Actions\Action::make('options')
                     ->color('gray')
                     ->icon('untitledui-dotpoints')
                     ->modalContent(fn (Attribute $record) => new HtmlString(

@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Enum\LocationType;
 use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Resources\LocationResource\Pages;
-use App\Filament\Resources\LocationResource\RelationManagers\UsersRelationManager;
+use App\Filament\Resources\LocationResource\Pages\ManageUsers;
 use App\Models\Location;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -15,7 +15,9 @@ use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class LocationResource extends Resource
@@ -102,16 +104,32 @@ class LocationResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                // ->slideOver()
-                // ->modalWidth('md')
-                // ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
-                //     if ($data['is_main'] ?? false) {
-                //         static::getEloquentQuery()->update(['is_main' => false]);
-                //     }
+                Tables\Actions\Action::make('users')
+                    ->color('gray')
+                    ->icon('untitledui-dotpoints')
+                    ->modalContent(fn (Location $record) => new HtmlString(
+                        Blade::render('@livewire('.ManageUsers::class.'::class, [
+                            \'record\' => '.$record->getKey().',
+                        ])')
+                    ))
+                    ->slideOver()
+                    ->modalWidth('md')
+                    ->modalHeading(fn (Location $record) => new HtmlString(
+                        Blade::render('<div class="flex">'.__('Location Users').' <x-filament::badge class="px-1 mx-1" type="primary">'.$record->name.'</x-filament::badge></div>')
+                    ))
+                    ->modalDescription(fn (Location $record) => __('Manage users for :name.', ['name' => $record->name]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false),
+                Tables\Actions\EditAction::make()
+                    ->slideOver()
+                    ->modalWidth('md')
+                    ->using(fn (array $data, Location $location) => DB::transaction(function () use ($data, $location) {
+                        if ($data['is_main'] ?? false) {
+                            static::getEloquentQuery()->update(['is_main' => false]);
+                        }
 
-                //     $location->update($data);
-                // })),
+                        $location->update($data);
+                    })),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -123,7 +141,7 @@ class LocationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            UsersRelationManager::class,
+            //
         ];
     }
 
@@ -132,7 +150,8 @@ class LocationResource extends Resource
         return [
             'index' => Pages\ListLocations::route('/'),
             // 'create' => Pages\CreateLocation::route('/create'),
-            'edit' => Pages\EditLocation::route('/{record}/edit'),
+            // 'edit' => Pages\EditLocation::route('/{record}/edit'),
+            // 'users' => Pages\ManageUsers::route('/{record}/users'),
         ];
     }
 }

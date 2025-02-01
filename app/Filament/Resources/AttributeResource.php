@@ -23,7 +23,11 @@ class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
+    protected static ?string $navigationGroup = 'Catalog';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationParentItem = 'Products';
 
     public static function form(Form $form): Form
     {

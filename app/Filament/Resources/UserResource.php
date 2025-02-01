@@ -30,6 +30,9 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Hidden::make('is_user_exists')
+                    ->dehydrated(fn (Forms\Get $get) => $get('is_user_exists'))
+                    ->default(false),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
@@ -37,7 +40,7 @@ class UserResource extends Resource
                     ->helperText(fn (Forms\Get $get) => $get('is_user_exists') ? __('This found user will be used instead of creating a new one.') : null),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->unique(ignoreRecord: true)
+                    // ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255)
                     ->afterStateUpdated(function (?string $state, Forms\Get $get, Forms\Set $set) {

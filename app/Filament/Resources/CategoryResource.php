@@ -150,6 +150,7 @@ class CategoryResource extends Resource
                     ->sortable(),
             ])
             ->reorderable('position')
+            ->defaultSort('position')
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->slideOver()

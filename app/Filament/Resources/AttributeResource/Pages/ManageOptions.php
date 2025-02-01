@@ -80,6 +80,8 @@ class ManageOptions extends ManageRelatedRecords
                 Tables\Columns\TextColumn::make('key')
                     ->label(__('forms.label.key')),
             ])
+            ->reorderable('position')
+            ->defaultSort('position')
             ->filters([
                 //
             ])

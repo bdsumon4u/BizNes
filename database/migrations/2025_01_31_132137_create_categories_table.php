@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('slug');
             $table->text('description')->nullable();
             $table->string('logo')->nullable();
-            $table->smallInteger('position')->default(0);
+            $table->unsignedSmallInteger('position')->default(0);
             $table->boolean('is_enabled')->default(true);
 
             $table->seo_v1($table);

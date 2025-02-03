@@ -6,6 +6,7 @@ export default {
         './app/Filament/**/*.php',
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
+        './vendor/jaocero/radio-deck/resources/views/**/*.blade.php',
         'resources/css/filament/studio/theme.css',
     ],
 }

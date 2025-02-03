@@ -13,15 +13,11 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained();
             $table->string('external_id')->nullable();
-            $table->string('name');
-            $table->string('slug')->nullable();
-            $table->string('sku')->nullable();
-            $table->string('barcode')->nullable();
-            $table->longText('description')->nullable();
+            $table->foreignId('brand_id')->nullable()->constrained();
+            $this->addSomeFields($table);
             $table->text('summary')->nullable();
-            $table->integer('security_stock')->default(0);
+            $table->longText('description')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_visible')->default(false);
             $table->string('type')->nullable();
@@ -31,33 +27,18 @@ return new class extends Migration
 
             $table->timestamp('published_at')->useCurrent();
             $table->timestamps();
-            
-            foreach (['slug', 'sku', 'barcode'] as $column) {
-                $table->unique(['business_id', $column]);
-            }
         });
 
         Schema::create('variants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained();
             $table->foreignId('product_id')->constrained();
-            $table->string('name');
-            $table->string('slug')->nullable();
-            $table->string('sku')->nullable();
-            $table->string('barcode')->nullable();
-            $table->string('ean')->nullable();
-            $table->string('upc')->nullable();
-            $table->boolean('allow_backorder')->default(false);
+            $this->addSomeFields($table);
             $table->unsignedInteger('position')->default(0);
 
             $table->shipping_v1($table);
             $table->json('metadata')->nullable();
 
             $table->timestamps();
-            
-            foreach (['slug', 'sku', 'barcode', 'ean', 'upc'] as $column) {
-                $table->unique(['business_id', $column]);
-            }
         });
 
         Schema::create('product_has_relations', function (Blueprint $table): void {
@@ -90,5 +71,22 @@ return new class extends Migration
         Schema::dropIfExists('product_has_relations');
         Schema::dropIfExists('variants');
         Schema::dropIfExists('products');
+    }
+
+    private function addSomeFields(Blueprint $table): void
+    {
+        $table->foreignId('business_id')->constrained();
+        $table->string('name');
+        $table->string('slug');
+        $table->string('sku')->nullable();
+        $table->string('ean')->nullable();
+        $table->string('upc')->nullable();
+        $table->string('barcode')->nullable();
+        $table->integer('security_stock')->default(1);
+        $table->boolean('allow_backorder')->default(false);
+
+        foreach (['slug', 'sku', 'barcode', 'ean', 'upc'] as $column) {
+            $table->unique(['business_id', $column]);
+        }
     }
 };

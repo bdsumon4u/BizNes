@@ -11,6 +11,7 @@
         "bezhansalleh/filament-shield": "^3.3",
         "devdojo/auth": "^1.0",
         "filament/filament": "^3.2",
+        "jaocero/radio-deck": "^1.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "mckenziearts/blade-untitledui-icons": "^1.3",

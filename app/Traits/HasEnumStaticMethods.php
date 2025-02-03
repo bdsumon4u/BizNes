@@ -15,19 +15,29 @@ trait HasEnumStaticMethods
         return $this->value;
     }
 
-    public static function __callStatic(string $name, mixed $args): int|string
+    public static function __callStatic(string $name, mixed $args): bool|int|string
     {
-        $cases = static::cases();
+        $case = collect(static::cases())->firstWhere('name', $name);
 
-        foreach ($cases as $case) {
-            if ($case->name === $name) {
-                return $case->value;
-            }
+        if (! $case) {
+            throw new UndefinedEnumCaseError(
+                enum: static::class,
+                case: $name,
+            );
         }
 
-        throw new UndefinedEnumCaseError(
-            enum: self::class,
-            case: $name,
-        );
+        if (array_key_exists('case', $args)) {
+            return $case === $args['case'];
+        }
+
+        if (array_key_exists('name', $args)) {
+            return $case->name === $args['name'];
+        }
+
+        if (array_key_exists('value', $args)) {
+            return $case->value === $args['value'];
+        }
+
+        return $case->value;
     }
 }

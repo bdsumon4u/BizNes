@@ -26,15 +26,11 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
 
     public function resolveRouteBinding($value, $field = null)
     {
-        if ($value === parse_url(config('app.url'), PHP_URL_HOST)) {
-            $value = request()->get('tenant', session('tenant'));
-
-            if (! $value) {
-                return Filament::getUserDefaultTenant(Filament::auth()->user());
-            }
+        if ($value === domain()) {
+            return Filament::getUserDefaultTenant(Filament::auth()->user());
         }
 
-        $value = str($value)->beforeLast('.'.parse_url(config('app.url'), PHP_URL_HOST));
+        $value = str($value)->beforeLast(subdomain());
 
         $record = parent::resolveRouteBinding($value, $field);
 
@@ -47,19 +43,19 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
     {
         return Attribute::make(
             get: function ($value) {
-                if (Str::startsWith($value, config('app.url'))) {
-                    return $value;
+                if (request()->getHost() === domain()) {
+                    if (request()->is(Filament::getDefaultPanel()->getPath())) {
+                        return domain();
+                    }
+
+                    return subdomain($value);
                 }
 
-                if (Str::endsWith(request()->getHost(), parse_url(config('app.url'), PHP_URL_HOST))) {
-                    return $value.'.'.parse_url(config('app.url'), PHP_URL_HOST);
+                if (Str::endsWith(request()->getHost(), subdomain())) {
+                    return subdomain($value);
                 }
 
-                if (filter_var($value, FILTER_VALIDATE_DOMAIN)) {
-                    return $value;
-                }
-
-                return $value.'.'.parse_url(config('app.url'), PHP_URL_HOST);
+                return is_tld($value) ? $value : subdomain($value);
             },
         );
     }

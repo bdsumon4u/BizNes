@@ -61,7 +61,8 @@ class UserResource extends Resource
                     ->label(__('Businesses'))
                     ->counts('businesses')
                     ->sortable()
-                    ->badge(),
+                    ->badge()
+                    ->alignCenter(),
             ])
             ->filters([
                 TernaryFilter::make('email_verified_at')
@@ -107,7 +108,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->whereHas('ownedBusinesses')
+            // ->whereHas('ownedBusinesses')
             ->withCount('ownedBusinesses');
     }
 }

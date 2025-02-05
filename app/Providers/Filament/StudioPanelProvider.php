@@ -77,6 +77,7 @@ class StudioPanelProvider extends PanelProvider
                 EnsureEmailIsVerified::class,
             ])
             ->tenant(Business::class, 'uuid')
+            ->tenantDomain('{tenant:uuid}')
             ->tenantMenuItems([
                 'register' => MenuItem::make()->visible(function () {
                     return optional(Filament::auth()->user())->businesses()->count() < 4;

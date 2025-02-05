@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Exceptions\TenantNotFoundException;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasCurrentTenantLabel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +22,46 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
         static::creating(function (Business $business) {
             $business->uuid = Str::uuid();
         });
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if ($value === parse_url(config('app.url'), PHP_URL_HOST)) {
+            $value = request()->get('tenant', session('tenant'));
+
+            if (! $value) {
+                return Filament::getUserDefaultTenant(Filament::auth()->user());
+            }
+        }
+
+        $value = str($value)->beforeLast('.'.parse_url(config('app.url'), PHP_URL_HOST));
+
+        $record = parent::resolveRouteBinding($value, $field);
+
+        throw_unless($record, (new TenantNotFoundException)->setModel(static::class, [$value]));
+
+        return $record;
+    }
+
+    public function uuid(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (Str::startsWith($value, config('app.url'))) {
+                    return $value;
+                }
+
+                if (Str::endsWith(request()->getHost(), parse_url(config('app.url'), PHP_URL_HOST))) {
+                    return $value.'.'.parse_url(config('app.url'), PHP_URL_HOST);
+                }
+
+                if (filter_var($value, FILTER_VALIDATE_DOMAIN)) {
+                    return $value;
+                }
+
+                return $value.'.'.parse_url(config('app.url'), PHP_URL_HOST);
+            },
+        );
     }
 
     public function getFilamentAvatarUrl(): ?string

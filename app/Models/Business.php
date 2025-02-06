@@ -65,6 +65,11 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
         return isset($this->favicon) ? Storage::url($this->favicon) : null;
     }
 
+    public function getFilamentLogoUrl(): ?string
+    {
+        return isset($this->logo) ? Storage::url($this->logo) : null;
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot('is_owner');

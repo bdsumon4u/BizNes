@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Clusters\Tenancy\BusinessSettings;
 use App\Filament\Pages\Tenancy\RegisterBusiness;
+use App\Http\Middleware\SetTenantConfig;
 use App\Models\Business;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
@@ -41,6 +42,7 @@ class StudioPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->font('Roboto', provider: GoogleFontProvider::class)
+            ->brandLogo(fn () => Filament::getTenant()?->getFilamentLogoUrl())
             ->favicon(fn () => Filament::getTenant()?->getFilamentAvatarUrl())
             ->globalSearch()
             ->sidebarWidth('16rem')
@@ -68,6 +70,9 @@ class StudioPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
+            ])
+            ->tenantMiddleware([
+                SetTenantConfig::class,
             ])
             ->tenantMiddleware([
                 SyncShieldTenant::class,

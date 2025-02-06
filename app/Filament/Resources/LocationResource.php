@@ -28,7 +28,7 @@ class LocationResource extends Resource
 
     protected static ?string $navigationIcon = 'ri-map-pin-line';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {

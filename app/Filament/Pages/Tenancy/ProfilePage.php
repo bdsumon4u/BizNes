@@ -20,6 +20,8 @@ class ProfilePage extends EditTenantProfile
 
     protected static ?string $navigationLabel = 'Profile';
 
+    protected static ?int $navigationSort = 0;
+
     protected static ?string $navigationIcon = 'ri-profile-line';
 
     public static function getBreadcrumb(): string

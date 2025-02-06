@@ -13,6 +13,7 @@
         "filament/filament": "^3.2.135",
         "jaocero/radio-deck": "^1.2.9",
         "laravel/framework": "^11.41",
+        "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.10.1",
         "mckenziearts/blade-untitledui-icons": "^1.3.1",
         "staudenmeir/laravel-adjacency-list": "^1.23.2",

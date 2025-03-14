@@ -22,6 +22,10 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
         static::creating(function (Business $business) {
             $business->uuid = Str::uuid();
         });
+
+        foreach ([Role::class, Location::class, Brand::class, Category::class, Attribute::class, Product::class, CustomerGroup::class] as $class) {
+            static::resolveRelationUsing(str(class_basename($class))->camel()->plural()->toString(), fn (Model $model) => $model->hasMany($class));
+        }
     }
 
     public function resolveRouteBinding($value, $field = null)
@@ -78,36 +82,6 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
     public function owners(): BelongsToMany
     {
         return $this->users()->wherePivot('is_owner', true);
-    }
-
-    public function roles(): HasMany
-    {
-        return $this->hasMany(Role::class);
-    }
-
-    public function locations(): HasMany
-    {
-        return $this->hasMany(Location::class);
-    }
-
-    public function brands(): HasMany
-    {
-        return $this->hasMany(Brand::class);
-    }
-
-    public function categories(): HasMany
-    {
-        return $this->hasMany(Category::class);
-    }
-
-    public function attributes(): HasMany
-    {
-        return $this->hasMany(Attribute::class);
-    }
-
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class);
     }
 
     public function getCurrentTenantLabel(): string

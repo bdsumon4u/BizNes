@@ -1,3 +1,28 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
 @import '../../treeselect.css';
 @config 'tailwind.config.js';
+
+/* .fi-body {
+    @apply bg-white dark:bg-gray-800;
+}
+
+.fi-sidebar {
+    @apply bg-gray-50 dark:bg-gray-900;
+} */
+
+.fi-sidebar {
+    @apply border-r dark:border-gray-800;
+}
+
+.fi-sidebar-nav-groups {
+    @apply gap-y-2;
+}
+
+.fi-breadcrumbs-item-label {
+    @apply rounded-md px-2 py-1.5;
+}
+
+.fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label,
+.fi-breadcrumbs-item:hover .fi-breadcrumbs-item-label {
+    @apply bg-gray-100;
+}

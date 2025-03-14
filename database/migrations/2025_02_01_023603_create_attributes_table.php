@@ -44,7 +44,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('attribute_attribute_groups', function (Blueprint $table) {
+        Schema::create('attribute_attribute_group', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id')->constrained();
             $table->foreignId('attribute_group_id')->constrained();
@@ -56,7 +56,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attribute_attribute_groups');
+        Schema::dropIfExists('attribute_attribute_group');
         Schema::dropIfExists('attribute_groups');
         Schema::dropIfExists('options');
         Schema::dropIfExists('attributes');

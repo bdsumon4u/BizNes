@@ -8,6 +8,8 @@ use App\Enum\Dimension\Weight;
 use App\Models\Permission;
 use App\Models\Role;
 use Carbon\CarbonImmutable;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput\Actions\HidePasswordAction;
 use Filament\Forms\Components\TextInput\Actions\ShowPasswordAction;
 use Filament\Tables\Table;
@@ -48,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
         Table::$defaultDateDisplayFormat = 'd-M-Y';
         Table::$defaultTimeDisplayFormat = 'h:i:s A';
         Table::$defaultDateTimeDisplayFormat = 'd-M-Y h:i:s A';
+
+        // CreateAction::configureUsing(fn (CreateAction $action) => $action->icon('heroicon-o-plus'));
+        DeleteAction::configureUsing(fn (DeleteAction $action) => $action->icon('heroicon-o-trash'));
 
         ShowPasswordAction::configureUsing(function (ShowPasswordAction $action) {
             return $action->extraAttributes(['tabindex' => '-1']);

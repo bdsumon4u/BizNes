@@ -36,6 +36,19 @@ return new class extends Migration
 
             $table->unique(['attribute_id', 'key']);
         });
+
+        Schema::create('attribute_groups', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('business_id')->constrained();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('attribute_attribute_groups', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('attribute_id')->constrained();
+            $table->foreignId('attribute_group_id')->constrained();
+        });
     }
 
     /**
@@ -43,6 +56,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('attribute_attribute_groups');
+        Schema::dropIfExists('attribute_groups');
+        Schema::dropIfExists('options');
         Schema::dropIfExists('attributes');
     }
 };

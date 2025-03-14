@@ -15,7 +15,7 @@ use JaOcero\RadioDeck\Contracts\HasIcons;
  * @method static string External()
  * @method static string Virtual()
  * @method static string Standard()
- * @method static string Variant()
+ * @method static string Service()
  */
 enum ProductType: string implements HasColor, HasDescription, HasDescriptions, HasIcon, HasIcons, HasLabel
 {
@@ -28,7 +28,7 @@ enum ProductType: string implements HasColor, HasDescription, HasDescriptions, H
 
     case Standard = 'standard';
 
-    case Variant = 'variant';
+    case Service = 'service';
 
     public function getLabel(): ?string
     {
@@ -36,7 +36,7 @@ enum ProductType: string implements HasColor, HasDescription, HasDescriptions, H
             self::External => __('External'),
             self::Virtual => __('Virtual'),
             self::Standard => __('Standard'),
-            self::Variant => __('Variant'),
+            self::Service => __('Service'),
         };
     }
 
@@ -45,8 +45,8 @@ enum ProductType: string implements HasColor, HasDescription, HasDescriptions, H
         return match ($this) {
             self::External => __('A product sourced from another supplier.'),
             self::Virtual => __('A digital product that can be downloaded by customers.'),
-            self::Standard => __('This product has no variations in size, color, or similar.'),
-            self::Variant => __('This product allows variations based on product attributes.'),
+            self::Standard => __('This product allows variations based on product attributes.'),
+            self::Service => __('This product has no variations in size, color, or similar.'),
         };
     }
 
@@ -60,8 +60,8 @@ enum ProductType: string implements HasColor, HasDescription, HasDescriptions, H
         return match ($this) {
             self::External => 'phosphor-link-simple-duotone',
             self::Virtual => 'phosphor-monitor-duotone',
-            self::Standard => 'phosphor-tag-duotone',
-            self::Variant => 'phosphor-swatches-duotone',
+            self::Standard => 'phosphor-swatches-duotone',
+            self::Service => 'phosphor-tag-duotone',
         };
     }
 
@@ -76,7 +76,7 @@ enum ProductType: string implements HasColor, HasDescription, HasDescriptions, H
             self::External => 'indigo',
             self::Virtual => 'info',
             self::Standard => 'gray',
-            self::Variant => 'primary',
+            self::Service => 'primary',
         };
     }
 }

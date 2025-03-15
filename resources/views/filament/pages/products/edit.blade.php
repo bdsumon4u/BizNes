@@ -115,7 +115,7 @@
             </x-filament::tabs>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4 resource-edit-tab-content">
             <div x-show="activeTab === 'detail'">
                 {{ $this->form }}
             </div>

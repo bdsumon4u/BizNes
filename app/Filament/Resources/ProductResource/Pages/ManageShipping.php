@@ -3,11 +3,9 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use Filament\Resources\Pages\Page;
+use Filament\Resources\Pages\EditRecord;
 
-class ManageShipping extends Page
+class ManageShipping extends EditRecord
 {
     protected static string $resource = ProductResource::class;
-
-    protected static string $view = 'filament.resources.product-resource.pages.manage-shipping';
 }

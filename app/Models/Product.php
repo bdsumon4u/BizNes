@@ -41,6 +41,13 @@ class Product extends Model implements HasMedia
             ->using(ProductPrice::class);
     }
 
+    public function attributes(): BelongsToMany
+    {
+        return $this->belongsToMany(Attribute::class)
+            ->withPivot(['option_id', 'value'])
+            ->using(AttributeProduct::class);
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('uploads')

@@ -2,6 +2,10 @@
 @import '../../treeselect.css';
 @config 'tailwind.config.js';
 
+.visit-site {
+    @apply items-center hidden p-1 text-gray-500 rounded-lg ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:ring-white/10 dark:hover:bg-gray-800 dark:hover:text-white lg:inline-flex;
+}
+
 /* .fi-body {
     @apply bg-white dark:bg-gray-800;
 }

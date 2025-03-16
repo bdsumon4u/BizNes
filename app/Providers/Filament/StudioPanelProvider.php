@@ -19,6 +19,8 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class StudioPanelProvider extends PanelProvider
@@ -45,6 +48,7 @@ class StudioPanelProvider extends PanelProvider
             ->brandLogo(fn () => Filament::getTenant()?->getFilamentLogoUrl())
             ->favicon(fn () => Filament::getTenant()?->getFilamentAvatarUrl())
             ->globalSearch()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()
             ->databaseNotifications()
@@ -99,5 +103,16 @@ class StudioPanelProvider extends PanelProvider
     public function boot(): void
     {
         Model::resolveRelationUsing('business', fn (Model $model) => $model->belongsTo(Business::class, (new Business)->getForeignKey()));
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+            fn () => Blade::render('<a
+                href="{{ url(\'/\') }}"
+                target="_blank"
+                class="visit-site"
+            >
+                <x-untitledui-google-chrome class="size-6" stroke-width="1.5" aria-hidden="true" />
+            </a>'),
+        );
     }
 }

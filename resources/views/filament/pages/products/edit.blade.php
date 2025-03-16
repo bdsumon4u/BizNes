@@ -149,7 +149,7 @@
 
             @if (true || $record->canUseAttributes())
                 <div x-cloak x-show="activeTab === 'attributes'">
-                    Attributes
+                    @livewire(\App\Filament\Resources\ProductResource\Pages\ManageAttributes::class, ['record' => $record->getKey()])
                 </div>
             @endif
 

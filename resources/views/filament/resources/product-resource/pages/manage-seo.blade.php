@@ -19,7 +19,7 @@
             />
         </x-filament-panels::form>
     @endcapture
-    <div x-data="{meta_title: null}" class="grid gap-6 lg:grid-cols-2 lg:gap-x-10">
+    <div x-data="{meta_title: null, meta_description: null}" class="grid gap-6 lg:grid-cols-2 lg:gap-x-10">
         {{ $form() }}
 
         <div class="max-w-xl">
@@ -43,9 +43,7 @@
                         <span class="mt-1 text-sm leading-5 text-green-600 truncate dark:text-green-400">
                             {{ config('app.url') }}/{your-custom-prefix}/{{ $data['slug'] }}
                         </span>
-                        <p class="mt-1 text-sm leading-5 text-gray-500 text-whitespace-no-wrap dark:text-gray-400">
-                            {{ $data['meta_description'] }}
-                        </p>
+                        <p class="mt-1 text-sm leading-5 text-gray-500 text-whitespace-no-wrap dark:text-gray-400" x-text="meta_description"></p>
                     </div>
                 </div>
             </div>

@@ -47,7 +47,7 @@ class ManageSEO extends EditRecord
                 Forms\Components\Textarea::make('meta_description')
                     ->label(__('Meta Description'))
                     ->maxLength(500)
-                    ->debounce(),
+                    ->extraAlpineAttributes(fn ($component) => ['x-init' => "\$watch('state', value => {$component->getName()} = value)"]),
                 Forms\Components\TextInput::make('meta_keywords')
                     ->label(__('Meta Keywords'))
                     ->maxLength(255),

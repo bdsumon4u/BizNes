@@ -6,7 +6,7 @@ use App\Exceptions\TenantNotFoundException;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasCurrentTenantLabel;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\Attribute as CastsAttribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,9 +43,9 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
         return $record;
     }
 
-    public function uuid(): Attribute
+    public function uuid(): CastsAttribute
     {
-        return Attribute::make(
+        return CastsAttribute::make(
             get: function ($value) {
                 if (request()->getHost() === domain()) {
                     if (request()->is(Filament::getDefaultPanel()->getPath())) {

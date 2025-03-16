@@ -50,7 +50,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attribute_id')->constrained();
             $table->foreignId('product_id')->constrained();
-            $table->foreignId('option_id')->constrained()->nullable();
+            $table->foreignId('option_id')->nullable()->constrained();
             $table->text('value')->nullable();
         });
 

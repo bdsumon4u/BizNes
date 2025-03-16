@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\FieldType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute as CastsAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -63,6 +64,12 @@ class Attribute extends Model
             FieldType::DatePicker,
         ]);
     }
+
+    public function scopeEnabled(Builder $query): Builder
+    {
+        return $query->where('is_enabled', true);
+    }
+
 
     public function options(): HasMany
     {

@@ -32,6 +32,11 @@ class CustomerResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading(__('You have NO customer!'))
+            ->emptyStateDescription(__('Just start marketing.'))
+            ->emptyStateActions([
+                Tables\Actions\Action::make('start'),
+            ])
             ->columns([
                 //
             ])

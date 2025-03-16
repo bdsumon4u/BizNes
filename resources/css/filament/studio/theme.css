@@ -31,6 +31,18 @@
     @apply bg-gray-100;
 }
 
-.resource-edit-tab-content .fi-resource-products > section {
+.resource-edit-tab {
+    @apply lg:-mx-8;
+}
+
+.resource-edit-tab-content .fi-resource-products>section {
     @apply pt-0 gap-y-4;
+}
+
+.resource-edit-tab-content .fi-header-heading {
+    @apply text-xl sm:text-2xl;
+}
+
+.resource-edit-tab-content .fi-header-subheading {
+    @apply text-base;
 }

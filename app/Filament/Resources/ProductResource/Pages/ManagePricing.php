@@ -21,6 +21,16 @@ class ManagePricing extends ManageRelatedRecords
 
     protected static string $relationship = 'prices';
 
+    public function getHeading(): string
+    {
+        return '';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -32,12 +42,12 @@ class ManagePricing extends ManageRelatedRecords
                 Tables\Columns\TextColumn::make('price'),
             ])
             // ->defaultSort(fn ($query) => $query->orderByRaw('position, quantity'))
-            // ->defaultGroup(
-            //     Group::make('name')
-            //         ->collapsible()
-            //         ->titlePrefixedWithLabel(false)
-            //         // ->orderQueryUsing(fn (Builder $query, string $direction) => $query->orderByRaw('business_id IS NOT NULL, position ' . $direction))
-            //     )
+            ->defaultGroup(
+                Group::make('name')
+                    ->collapsible()
+                    ->titlePrefixedWithLabel(false)
+                    ->orderQueryUsing(fn (Builder $query, string $direction) => $query->orderByRaw('business_id IS NOT NULL, position asc, quantity desc'))
+                )
             ->filters([
                 //
             ])
@@ -66,8 +76,7 @@ class ManagePricing extends ManageRelatedRecords
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->form(fn (Tables\Actions\EditAction $action): array => [
-                        // $action->getRecordSelect()->autofocus(),
+                    ->form(fn (): array => [
                         Forms\Components\TextInput::make('quantity')
                             ->placeholder(__('Minimum quantity')),
                         Forms\Components\TextInput::make('price')
@@ -75,6 +84,7 @@ class ManagePricing extends ManageRelatedRecords
                     ])
                     ->slideOver()
                     ->modalWidth('md'),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
 }

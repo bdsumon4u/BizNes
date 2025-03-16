@@ -23,7 +23,7 @@
             activeTab: @entangle('activeTab')
         }"
     >
-        <div class="sticky z-30 -mx-6 -mt-4 lg:-mx-8 bg-white/75 backdrop-blur-sm dark:bg-gray-900/80 top-16">
+        <div x-bind:class="{'resource-edit-tab': $store.sidebar.isOpen}" class="sticky z-30 -mx-4 -mt-4 md:-mx-6 lg:mx-0 bg-white/75 backdrop-blur-sm dark:bg-gray-900/80 top-16">
             <x-filament::tabs :contained="true">
                 <x-filament::tabs.item
                     alpine-active="activeTab === 'detail'"
@@ -117,7 +117,22 @@
 
         <div class="mt-4 resource-edit-tab-content">
             <div x-show="activeTab === 'detail'">
-                {{ $this->form }}
+                @capture($form)
+                    <x-filament-panels::form
+                        id="form"
+                        :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
+                        wire:submit="save"
+                    >
+                        {{ $this->form }}
+
+                        <x-filament-panels::form.actions
+                            :actions="$this->getCachedFormActions()"
+                            :full-width="$this->hasFullWidthFormActions()"
+                        />
+                    </x-filament-panels::form>
+                @endcapture
+
+                {{ $form() }}
             </div>
             <div x-show="activeTab === 'media'">
                 @livewire(\App\Filament\Resources\ProductResource\Pages\ManageMedia::class, ['record' => $record->getKey()])
@@ -148,7 +163,7 @@
                 Inventory
             </div>
             <div x-cloak x-show="activeTab === 'seo'">
-                Seo
+                @livewire(\App\Filament\Resources\ProductResource\Pages\ManageSEO::class, ['record' => $record->getKey()])
             </div>
 
             @if (true || $record->canUseShipping())

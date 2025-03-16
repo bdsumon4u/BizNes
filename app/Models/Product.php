@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
+    use InteractsWithMedia;
 
     protected function casts(): array
     {
@@ -36,5 +39,19 @@ class Product extends Model
         return $this->belongsToMany(CustomerGroup::class, 'product_prices')
             ->withPivot(['id', 'quantity', 'price'])
             ->using(ProductPrice::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('uploads')
+            ->acceptsMimeTypes(['image/jpg', 'image/jpeg', 'image/png'])
+            ->useFallbackUrl(url('/imgs/no-image-100x100.svg'));
+
+        $this->addMediaCollection('thumbnail')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpg', 'image/jpeg', 'image/png'])
+            ->useFallbackUrl(url('/imgs/no-image-100x100.svg'));
+
+        $this->addMediaCollection('files');
     }
 }

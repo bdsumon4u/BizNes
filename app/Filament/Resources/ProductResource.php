@@ -33,7 +33,50 @@ class ProductResource extends Resource
     public static function form(Form $form): Form
     {
         if ($form->getRecord()) {
-            return $form;
+            return $form
+                ->schema([
+                    Forms\Components\Section::make(__('General information'))
+                        ->collapsible()
+                        ->compact()
+                        ->description(fn (Product $product) => $product->type?->getDescription())
+                        ->icon(fn (Product $product) => $product->type?->getIcon())
+                        ->iconSize(IconSize::Large)
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->default('Table set')
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                    $set('slug', Str::slug($state));
+                                }),
+                            Forms\Components\TextInput::make('slug')
+                                ->disabled()
+                                ->dehydrated()
+                                ->required()
+                                ->maxLength(255)
+                                ->default('table-set')
+                                ->unique(ignoreRecord: true),
+                            Forms\Components\Textarea::make('summary')
+                                ->columnSpan('full'),
+                            Forms\Components\RichEditor::make('description')
+                                ->columnSpan('full'),
+
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    // Components\Separator::make()
+                                    //     ->columnSpanFull(),
+
+                                    Forms\Components\TextInput::make('external_id')
+                                        ->label(__('External Product ID'))
+                                        ->exists(Product::class)
+                                        ->helperText(__('The original identifier of your product from the external supplier.')),
+                                ])
+                                ->columnSpanFull()
+                                ->columns(),
+                        ])
+                        ->columns(),
+                ]);
         }
 
         return $form

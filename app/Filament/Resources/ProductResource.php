@@ -14,6 +14,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -466,9 +467,9 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('thumbnail')
-                    ->square()
-                    ->grow(false),
+                SpatieMediaLibraryImageColumn::make('thumbnail')
+                    ->collection('thumbnail')
+                    ->square(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),

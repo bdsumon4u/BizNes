@@ -155,7 +155,7 @@
 
             @if (true || $record->canUseVariants())
                 <div x-cloak x-show="activeTab === 'variants'">
-                    Variants
+                    @livewire(\App\Filament\Resources\ProductResource\Pages\ManageVariants::class, ['record' => $record->getKey()])
                 </div>
             @endif
 

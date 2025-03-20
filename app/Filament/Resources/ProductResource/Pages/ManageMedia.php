@@ -31,6 +31,14 @@ class ManageMedia extends EditRecord
             ->columns($this->hasInlineLabels() ? 1 : 2)
             ->inlineLabel($this->hasInlineLabels())
             ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnail')
+                    ->collection('thumbnail')
+                    ->directory('products/images')
+                    ->helperText(__('Used to represent your product during checkout, social sharing and more.'))
+                    ->image()
+                    ->panelLayout('grid')
+                    ->maxSize(512)
+                    ->columnSpan(['lg' => 1]),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                     ->collection('uploads')
                     ->directory('products/images')
@@ -39,7 +47,8 @@ class ManageMedia extends EditRecord
                     ->reorderable()
                     ->panelLayout('grid')
                     ->maxSize(512)
-                    ->columnSpanFull(),
-            ]);
+                    ->columnSpan(['lg' => 2]),
+            ])
+            ->columns(3);
     }
 }

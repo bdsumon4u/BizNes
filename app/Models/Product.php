@@ -16,6 +16,7 @@ class Product extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
+
     use InteractsWithMedia;
 
     protected function casts(): array

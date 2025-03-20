@@ -23,7 +23,7 @@ class TextInputSelect extends TextInput
 
     protected string $position = 'suffix';
 
-    public function select(Closure | Select $closure): TextInputSelect
+    public function select(Closure|Select $closure): TextInputSelect
     {
         if ($closure instanceof Select) {
             $this->selectComponentClosure = fn () => $closure;

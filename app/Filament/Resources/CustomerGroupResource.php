@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
-use App\Filament\Resources\CustomerGroupResource\RelationManagers;
 use App\Models\CustomerGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,7 +11,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomerGroupResource extends Resource
 {

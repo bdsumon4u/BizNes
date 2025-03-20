@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-use Illuminate\Support\Arr;
 use App\Models\Attribute;
 use App\Models\AttributeProduct;
 use App\Models\Option;
 use App\Models\Product;
+use Illuminate\Support\Arr;
 
 final class MapProductOptions
 {
@@ -42,7 +42,7 @@ final class MapProductOptions
     {
         return [
             'id' => $attribut->id,
-            'key' => 'attribute_' . $attribut->id,
+            'key' => 'attribute_'.$attribut->id,
             'name' => $attribut->name,
             'options' => $options,
         ];
@@ -52,7 +52,7 @@ final class MapProductOptions
     {
         return [
             'id' => $option->id,
-            'key' => 'option_' . $option->id,
+            'key' => 'option_'.$option->id,
             'option' => $option->value,
         ];
     }

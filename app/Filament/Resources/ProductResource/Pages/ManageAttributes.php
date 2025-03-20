@@ -8,9 +8,7 @@ use App\Filament\Resources\ProductResource;
 use App\Models\Attribute;
 use App\Models\AttributeProduct;
 use App\Tables\Columns\IconColumn;
-use Filament\Actions;
 use Filament\Forms;
-use Filament\Forms\Components\ViewField;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRelatedRecords;
@@ -19,11 +17,7 @@ use Filament\Support\Enums\IconSize;
 use Filament\Tables;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\HtmlString;
 use JaOcero\RadioDeck\Forms\Components\RadioDeck;
 use Livewire\Attributes\Lazy;
 
@@ -84,116 +78,116 @@ class ManageAttributes extends ManageRelatedRecords
                     ->label(__('Choose attributes'))
                     ->steps([
                         Forms\Components\Wizard\Step::make('attributes')
-                                ->icon('untitledui-puzzle-piece')
-                                ->schema([
-                                    RadioDeck::make('attributes')
-                                        ->options(
-                                            AttributeResource::getEloquentQuery()
-                                                ->scopes('enabled')
-                                                ->select('id', 'name')
-                                                ->pluck('name', 'id')
-                                        )
-                                        ->descriptions(
-                                            AttributeResource::getEloquentQuery()
-                                                ->scopes('enabled')
-                                                ->select('id', 'description')
-                                                ->pluck('description', 'id')
-                                                ->toArray()
-                                        )
-                                        ->icons(
-                                            AttributeResource::getEloquentQuery()
-                                                ->scopes('enabled')
-                                                ->select('id', 'icon')
-                                                ->pluck('icon', 'id')
-                                                ->toArray()
-                                        )
-                                        ->alignment(Alignment::Start)
-                                        ->iconSize(IconSize::Small)
-                                        ->color('primary')
-                                        ->columns(2)
-                                        ->live()
-                                        ->afterStateUpdated(
-                                            fn (RadioDeck $component) => $component->getContainer()
-                                                ->getParentComponent()
-                                                ->getContainer()
-                                                ->getComponent('options')
-                                                ->getChildComponentContainer()
-                                                ->fill()
-                                        )
-                                        ->multiple()
-                                        ->required(),
-                                ]),
-                            Forms\Components\Wizard\Step::make('options')
-                                ->icon('untitledui-dotpoints')
-                                ->schema([
-                                    Forms\Components\Grid::make()
-                                        ->schema(function (Forms\Get $get): array {
-                                            $selectSchema = [];
-                                            $textSchema = [];
+                            ->icon('untitledui-puzzle-piece')
+                            ->schema([
+                                RadioDeck::make('attributes')
+                                    ->options(
+                                        AttributeResource::getEloquentQuery()
+                                            ->scopes('enabled')
+                                            ->select('id', 'name')
+                                            ->pluck('name', 'id')
+                                    )
+                                    ->descriptions(
+                                        AttributeResource::getEloquentQuery()
+                                            ->scopes('enabled')
+                                            ->select('id', 'description')
+                                            ->pluck('description', 'id')
+                                            ->toArray()
+                                    )
+                                    ->icons(
+                                        AttributeResource::getEloquentQuery()
+                                            ->scopes('enabled')
+                                            ->select('id', 'icon')
+                                            ->pluck('icon', 'id')
+                                            ->toArray()
+                                    )
+                                    ->alignment(Alignment::Start)
+                                    ->iconSize(IconSize::Small)
+                                    ->color('primary')
+                                    ->columns(2)
+                                    ->live()
+                                    ->afterStateUpdated(
+                                        fn (RadioDeck $component) => $component->getContainer()
+                                            ->getParentComponent()
+                                            ->getContainer()
+                                            ->getComponent('options')
+                                            ->getChildComponentContainer()
+                                            ->fill()
+                                    )
+                                    ->multiple()
+                                    ->required(),
+                            ]),
+                        Forms\Components\Wizard\Step::make('options')
+                            ->icon('untitledui-dotpoints')
+                            ->schema([
+                                Forms\Components\Grid::make()
+                                    ->schema(function (Forms\Get $get): array {
+                                        $selectSchema = [];
+                                        $textSchema = [];
 
-                                            $attributes = Attribute::with('options')
-                                                ->select('id', 'name', 'type', 'slug')
-                                                ->whereIn('id', $get('attributes'))
-                                                ->get();
+                                        $attributes = Attribute::with('options')
+                                            ->select('id', 'name', 'type', 'slug')
+                                            ->whereIn('id', $get('attributes'))
+                                            ->get();
 
-                                            $selectedAttributes = AttributeProduct::query()
-                                                ->where('product_id', $this->getRecord()->getKey())
-                                                ->whereIn('attribute_id', $get('attributes'))
-                                                ->get()
-                                                ->mapToGroups(fn (AttributeProduct $attributeProduct) => [
-                                                    $attributeProduct->attribute_id => $attributeProduct->option_id,
-                                                ]);
+                                        $selectedAttributes = AttributeProduct::query()
+                                            ->where('product_id', $this->getRecord()->getKey())
+                                            ->whereIn('attribute_id', $get('attributes'))
+                                            ->get()
+                                            ->mapToGroups(fn (AttributeProduct $attributeProduct) => [
+                                                $attributeProduct->attribute_id => $attributeProduct->option_id,
+                                            ]);
 
-                                            foreach ($attributes as $attribute) {
-                                                /** @var Attribute $attribute */
-                                                if ($attribute->hasMultipleOptions() || $attribute->hasSingleOption()) {
-                                                    $selectSchema[] = Forms\Components\Select::make("options.{$attribute->id}")
-                                                        ->key($attribute->slug)
-                                                        ->label($attribute->name)
-                                                        ->required()
-                                                        ->options($attribute->options->pluck('value', 'id'))
-                                                        ->disableOptionWhen(
-                                                            fn (string $value): bool => in_array(
-                                                                $value,
-                                                                $selectedAttributes->get($attribute->id)?->toArray() ?? []
-                                                            )
+                                        foreach ($attributes as $attribute) {
+                                            /** @var Attribute $attribute */
+                                            if ($attribute->hasMultipleOptions() || $attribute->hasSingleOption()) {
+                                                $selectSchema[] = Forms\Components\Select::make("options.{$attribute->id}")
+                                                    ->key($attribute->slug)
+                                                    ->label($attribute->name)
+                                                    ->required()
+                                                    ->options($attribute->options->pluck('value', 'id'))
+                                                    ->disableOptionWhen(
+                                                        fn (string $value): bool => in_array(
+                                                            $value,
+                                                            $selectedAttributes->get($attribute->id)?->toArray() ?? []
                                                         )
-                                                        ->multiple($attribute->hasMultipleOptions())
-                                                        ->preload()
-                                                        ->optionsLimit(10)
-                                                        ->native(false);
-                                                }
-
-                                                if ($attribute->hasTextOption()) {
-                                                    $field = match ($attribute->type) {
-                                                        FieldType::RichText => Forms\Components\RichEditor::make("options.value.{$attribute->id}")
-                                                            ->label($attribute->name)
-                                                            ->key($attribute->slug)
-                                                            ->disabled($selectedAttributes->get($attribute->id) !== null)
-                                                            ->columnSpanFull(),
-                                                        FieldType::DatePicker => Forms\Components\DatePicker::make("options.value.{$attribute->id}")
-                                                            ->label($attribute->name)
-                                                            ->key($attribute->slug)
-                                                            ->disabled($selectedAttributes->get($attribute->id) !== null)
-                                                            ->native(false),
-                                                        default => Forms\Components\TextInput::make("options.value.{$attribute->id}")
-                                                            ->key($attribute->slug)
-                                                            ->disabled($selectedAttributes->get($attribute->id) !== null)
-                                                            ->label($attribute->name),
-                                                    };
-
-                                                    $textSchema[] = $field;
-                                                }
+                                                    )
+                                                    ->multiple($attribute->hasMultipleOptions())
+                                                    ->preload()
+                                                    ->optionsLimit(10)
+                                                    ->native(false);
                                             }
 
-                                            return array_merge(
-                                                $selectSchema,
-                                                count($textSchema) ? [/* SEPARATOR */] : [],
-                                                $textSchema
-                                            );
-                                        })
-                                        ->key('options'),
-                                ]),
+                                            if ($attribute->hasTextOption()) {
+                                                $field = match ($attribute->type) {
+                                                    FieldType::RichText => Forms\Components\RichEditor::make("options.value.{$attribute->id}")
+                                                        ->label($attribute->name)
+                                                        ->key($attribute->slug)
+                                                        ->disabled($selectedAttributes->get($attribute->id) !== null)
+                                                        ->columnSpanFull(),
+                                                    FieldType::DatePicker => Forms\Components\DatePicker::make("options.value.{$attribute->id}")
+                                                        ->label($attribute->name)
+                                                        ->key($attribute->slug)
+                                                        ->disabled($selectedAttributes->get($attribute->id) !== null)
+                                                        ->native(false),
+                                                    default => Forms\Components\TextInput::make("options.value.{$attribute->id}")
+                                                        ->key($attribute->slug)
+                                                        ->disabled($selectedAttributes->get($attribute->id) !== null)
+                                                        ->label($attribute->name),
+                                                };
+
+                                                $textSchema[] = $field;
+                                            }
+                                        }
+
+                                        return array_merge(
+                                            $selectSchema,
+                                            count($textSchema) ? [/* SEPARATOR */] : [],
+                                            $textSchema
+                                        );
+                                    })
+                                    ->key('options'),
+                            ]),
                     ])
                     ->action(function (array $data) {
                         $options = data_get($data, 'options');

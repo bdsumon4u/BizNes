@@ -3,24 +3,21 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\VariantResource;
 use App\Macros\Arr;
 use App\Models\Product;
 use App\Models\Variant;
-use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Lazy;
-use Livewire\Livewire;
 
 #[Lazy()]
 class ManageVariants extends ManageRelatedRecords
@@ -51,6 +48,9 @@ class ManageVariants extends ManageRelatedRecords
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')
                     ->collection('thumbnail')
                     ->square(),
@@ -79,21 +79,21 @@ class ManageVariants extends ManageRelatedRecords
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 // Tables\Actions\AssociateAction::make(),
+                // Tables\Actions\Action::make('generate')
+                //     ->icon($this->getRecord()->type->getIcon())
+                //     ->label(__('Generate variants'))
+                //     ->color('gray')
+                //     ->modalContent(fn () => new HtmlString( // closure is must.
+                //         Blade::render('@livewire('.GenerateVariants::class.'::class, [
+                //             \'record\' => '.$this->getRecord()->getKey().',
+                //         ])')
+                //     ))
+                //     ->visible($this->getRecord()->attributes->isNotEmpty())
+                //     ->slideOver()
+                //     ->modalWidth('lg')
+                //     ->modalSubmitAction(false)
+                //     ->modalCancelAction(false),
                 Tables\Actions\Action::make('generate')
-                    ->icon($this->getRecord()->type->getIcon())
-                    ->label(__('Generate variants'))
-                    ->color('gray')
-                    ->modalContent(fn () => new HtmlString( // closure is must.
-                        Blade::render('@livewire('.GenerateVariants::class.'::class, [
-                            \'record\' => '.$this->getRecord()->getKey().',
-                        ])')
-                    ))
-                    ->visible($this->getRecord()->attributes->isNotEmpty())
-                    ->slideOver()
-                    ->modalWidth('lg')
-                    ->modalSubmitAction(false)
-                    ->modalCancelAction(false),
-                Tables\Actions\CreateAction::make()
                     ->icon($this->getRecord()->type->getIcon())
                     ->label(__('Generate variants'))
                     ->color('gray')
@@ -111,7 +111,7 @@ class ManageVariants extends ManageRelatedRecords
                             ])
                             ->toArray();
 
-                        $variants = Variant::query()
+                        $existingVariants = Variant::query()
                             ->with(['options.attribute'])
                             ->where('product_id', $product->getKey())
                             ->get()
@@ -128,8 +128,8 @@ class ManageVariants extends ManageRelatedRecords
                                 )->toArray(),
                             ])
                             ->toArray();
-                            
-                        return ['variants' => $this->mapVariantsToProductOptions($product, $optionsValues, $variants)];
+
+                        return ['variants' => $this->mapVariantsToProductOptions($product, $optionsValues, $existingVariants)];
                     })
                     ->form([
                         Forms\Components\Repeater::make('variants')
@@ -141,7 +141,7 @@ class ManageVariants extends ManageRelatedRecords
                             ->columns(2)
                             ->collapsible()
                             ->addable(false)
-                            ->reorderable(false)
+                            ->orderColumn('position')
                             ->itemLabel(function (array $state): ?string {
                                 $label = $state['name'] ?? null;
                                 if (! $state['variant_id']) {
@@ -151,18 +151,23 @@ class ManageVariants extends ManageRelatedRecords
                                 return $label;
                             }),
                     ])
-                    ->using(function (array $data) {
+                    ->action(function (Tables\Actions\Action $action, array $data) {
                         DB::beginTransaction();
-                        foreach ($data['variants'] as $variantState) {
+                        foreach ($data['variants'] as $i => $variantState) {
                             $variant = Variant::query()->firstOrCreate([
                                 'id' => $variantState['variant_id'],
                             ], [
                                 'business_id' => Filament::getTenant()->getKey(),
                                 'name' => $variantState['name'],
+                                'position' => $i,
                                 'slug' => Str::slug($variantState['name']),
                                 'product_id' => $this->getRecord()->getKey(),
                                 'sku' => $variantState['sku'],
                             ]);
+
+                            if (! $variant->wasRecentlyCreated) {
+                                $variant->update(['position' => $i]);
+                            }
 
                             $variant->options()->sync($variantState['values']);
                         }
@@ -170,12 +175,11 @@ class ManageVariants extends ManageRelatedRecords
                         $variantIds = collect($data['variants'])->pluck('variant_id');
 
                         $this->getRecord()->variants()->whereNotIn('id', $variantIds)
-                            ->get()
-                            ->each(
-                                fn ($variant) => $variant->delete()
-                            );
+                            ->get()->each->delete();
 
                         DB::commit();
+
+                        $action->successNotificationTitle(__('Generated'))->success();
 
                         return $this->getRecord();
                     })
@@ -184,10 +188,11 @@ class ManageVariants extends ManageRelatedRecords
                     ->modalWidth('lg'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DissociateAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->url(fn (Variant $record) => VariantResource::getUrl('edit', ['record' => $record])),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DissociateAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -197,17 +202,15 @@ class ManageVariants extends ManageRelatedRecords
             ]);
     }
 
-    protected function mapVariantsToProductOptions(Product $product, array $options, array $variants): array
+    protected function mapVariantsToProductOptions(Product $product, array $options, array $existingVariants): array
     {
         $permutations = Arr::permutate($options);
 
         if (count($options) === 1) {
             $newPermutations = [];
 
-            foreach ($permutations as $p) {
-                $newPermutations[] = [
-                    array_key_first($options) => $p,
-                ];
+            foreach ($permutations as $permutation) {
+                $newPermutations[] = [array_key_first($options) => $permutation];
             }
 
             $permutations = $newPermutations;
@@ -216,7 +219,7 @@ class ManageVariants extends ManageRelatedRecords
         $variantPermutations = [];
 
         foreach ($permutations as $permutation) {
-            $variantIndex = collect($variants)->search(function ($variant) use ($permutation) {
+            $variantIndex = collect($existingVariants)->search(function ($variant) use ($permutation) {
                 $valueDifference = Arr::recursiveArrayDiffAssoc($permutation, $variant['options']);
 
                 if (! count($valueDifference)) {
@@ -228,23 +231,21 @@ class ManageVariants extends ManageRelatedRecords
                 return $amountMatched === count($variant['options']);
             });
 
-            $variant = $variants[$variantIndex] ?? null;
+            $variant = $existingVariants[$variantIndex] ?? null;
 
             $variantId = $variant['id'] ?? null;
             $name = $variant['name'] ?? Arr::performPermutationIntoWord($permutation, 'option');
-            $sku = $variant['sku'] ?? null;
+            $sku = $variant['sku'] ?? \Illuminate\Support\Arr::join([$product->sku, mb_strtoupper(
+                Str::slug(Arr::performPermutationIntoWord($permutation, 'option', '-'))
+            )], '-');
 
-            if ($variant) {
+            if ($variant) { // The variant already exists in the database.
                 $existing = collect($variantPermutations)
                     ->where('variant_id', $variant['id'])
                     ->first();
 
-                if ($existing) {
+                if ($existing) { // The variant alread exists in the array.
                     $variantId = null;
-                    $sku = \Illuminate\Support\Arr::join([
-                        $product->sku,
-                        mb_strtoupper(Str::slug(Arr::performPermutationIntoWord($permutation, 'option', '-'))),
-                    ], '-');
                 }
             }
 

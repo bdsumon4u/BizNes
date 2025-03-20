@@ -14,9 +14,6 @@ class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
-    /**
-     * @var view-string
-     */
     protected static string $view = 'filament.pages.products.edit';
 
     #[Url(as: 'tab')]

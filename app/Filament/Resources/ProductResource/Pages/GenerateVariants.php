@@ -6,7 +6,6 @@ use App\Filament\Resources\ProductResource;
 use App\Macros\Arr;
 use App\Models\Product;
 use App\Models\Variant;
-use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -22,7 +21,7 @@ class GenerateVariants extends EditRecord
 
     public array $variants = [];
 
-    protected function resolveRecord(int | string $key): Model
+    protected function resolveRecord(int|string $key): Model
     {
         $record = parent::resolveRecord($key);
 

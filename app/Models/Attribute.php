@@ -70,7 +70,6 @@ class Attribute extends Model
         return $query->where('is_enabled', true);
     }
 
-
     public function options(): HasMany
     {
         return $this->hasMany(Option::class);

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\CustomerGroupResource\Pages;
 
 use App\Filament\Resources\CustomerGroupResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCustomerGroup extends CreateRecord

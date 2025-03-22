@@ -10,6 +10,7 @@ use App\Models\Role;
 use Carbon\CarbonImmutable;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput\Actions\HidePasswordAction;
 use Filament\Forms\Components\TextInput\Actions\ShowPasswordAction;
 use Filament\Tables\Table;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -46,10 +48,13 @@ class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict(! app()->isProduction());
         URL::forceHttps(app()->isProduction());
         Model::unguard();
+        Number::useCurrency('BDT');
         Table::$defaultCurrency = 'bdt';
         Table::$defaultDateDisplayFormat = 'd-M-Y';
         Table::$defaultTimeDisplayFormat = 'h:i:s A';
         Table::$defaultDateTimeDisplayFormat = 'd-M-Y h:i:s A';
+
+        // Select::configureUsing(fn (Select $select) => $select->native(false));
 
         // CreateAction::configureUsing(fn (CreateAction $action) => $action->icon('heroicon-o-plus'));
         DeleteAction::configureUsing(fn (DeleteAction $action) => $action->icon('heroicon-o-trash'));

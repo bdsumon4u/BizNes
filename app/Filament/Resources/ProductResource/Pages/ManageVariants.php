@@ -53,7 +53,8 @@ class ManageVariants extends ManageRelatedRecords
                     ->sortable(),
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')
                     ->collection('thumbnail')
-                    ->square(),
+                    ->square()
+                    ->grow(false),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
@@ -76,6 +77,8 @@ class ManageVariants extends ManageRelatedRecords
             ->filters([
                 //
             ])
+            ->reorderable('position')
+            ->defaultSort('position')
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 // Tables\Actions\AssociateAction::make(),

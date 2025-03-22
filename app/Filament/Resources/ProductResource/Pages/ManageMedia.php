@@ -35,7 +35,6 @@ class ManageMedia extends EditRecord
                     ->directory('products/images')
                     ->helperText(__('Used to represent your product during checkout, social sharing and more.'))
                     ->image()
-                    ->panelLayout('grid')
                     ->maxSize(512)
                     ->columnSpan(['lg' => 1]),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('images')

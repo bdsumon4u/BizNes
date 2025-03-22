@@ -60,14 +60,17 @@ return new class extends Migration
             $table->foreignId('variant_id')->constrained();
         });
 
-        Schema::create('product_prices', function (Blueprint $table) {
+        Schema::create('prices', function (Blueprint $table) {
             $table->id();
+            $table->morphs('priceable');
             $table->foreignId('customer_group_id')->constrained();
-            $table->foreignId('product_id')->constrained();
-            $table->integer('quantity');
-            $table->integer('price');
+            $table->unsignedInteger('quantity');
+            $table->unsignedInteger('amount')->default(0);
+            $table->unsignedInteger('compare_amount')->default(0);
+            $table->unsignedInteger('cost_amount')->default(0);
+            $table->timestamps();
 
-            $table->unique(['customer_group_id', 'product_id',  'quantity']);
+            $table->unique(['priceable_id', 'priceable_type', 'customer_group_id', 'quantity'], 'prices_priceable_customer_group_quantity_unique');
         });
     }
 
@@ -76,7 +79,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_prices');
+        Schema::dropIfExists('prices');
         Schema::dropIfExists('option_variant');
         Schema::dropIfExists('attribute_product');
         Schema::dropIfExists('product_has_relations');

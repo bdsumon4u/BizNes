@@ -3,21 +3,25 @@
 namespace App\Models;
 
 use App\Enum\ProductType;
+use App\Traits\HasMedia;
+use App\Traits\HasPrices;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\HasMedia as IMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model implements HasMedia
+class Product extends Model implements IMedia
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
-
-    use InteractsWithMedia;
+    use HasMedia {
+        registerMediaCollections as registerMediaCollectionsFromTrait;
+    }
+    use HasPrices;
 
     protected function casts(): array
     {
@@ -36,13 +40,6 @@ class Product extends Model implements HasMedia
         return $this->morphedByMany(Category::class, 'productable', 'product_has_relations');
     }
 
-    public function prices(): BelongsToMany
-    {
-        return $this->belongsToMany(CustomerGroup::class, 'product_prices')
-            ->withPivot(['id', 'quantity', 'price'])
-            ->using(ProductPrice::class);
-    }
-
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class)
@@ -57,14 +54,7 @@ class Product extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('uploads')
-            ->acceptsMimeTypes(['image/jpg', 'image/jpeg', 'image/png'])
-            ->useFallbackUrl(url('/imgs/no-image-100x100.svg'));
-
-        $this->addMediaCollection('thumbnail')
-            ->singleFile()
-            ->acceptsMimeTypes(['image/jpg', 'image/jpeg', 'image/png'])
-            ->useFallbackUrl(url('/imgs/no-image-100x100.svg'));
+        $this->registerMediaCollectionsFromTrait();
 
         $this->addMediaCollection('files');
     }

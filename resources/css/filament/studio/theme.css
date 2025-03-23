@@ -32,7 +32,7 @@
 
 .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label,
 .fi-breadcrumbs-item:hover .fi-breadcrumbs-item-label {
-    @apply bg-gray-100;
+    @apply bg-gray-100 dark:bg-gray-800;
 }
 
 .resource-edit-tab {

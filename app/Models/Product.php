@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\MediaLibrary\HasMedia as IMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Product extends Model implements IMedia
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
+
     use HasMedia {
         registerMediaCollections as registerMediaCollectionsFromTrait;
     }

@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia as IMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Variant extends Model implements IMedia
 {
-    use HasPrices;
     use HasMedia {
         registerMediaCollections as registerMediaCollectionsFromTrait;
     }
+    use HasPrices;
 
     public function type(): Attribute
     {

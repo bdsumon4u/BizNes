@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('businesses', function (Blueprint $table) {
             $table->id()->startingValue(1001);
-            $table->uuid('uuid')->unique();
+            $table->string('domain')->unique();
             $table->string('name')->index();
             $table->string('email')->unique();
             $table->string('phone')->unique();

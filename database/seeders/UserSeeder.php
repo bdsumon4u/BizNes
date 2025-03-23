@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Business;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
@@ -22,5 +23,8 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('password'),
         ]);
+
+        // User::factory(10)->hasAttached(Business::factory(), ['is_owner' => true])->create();
+        // User::factory(10)->hasAttached(Business::query()->inRandomOrder()->take(3)->get())->create();
     }
 }

@@ -57,7 +57,7 @@ class User extends AuthUser implements FilamentUser, HasTenants
     public function businesses(): BelongsToMany
     {
         return $this->belongsToMany(Business::class)
-            ->select((new Business)->getQualifiedKeyName(), 'name', 'uuid')
+            ->select((new Business)->getQualifiedKeyName(), 'name', 'domain')
             ->withPivot('is_owner');
     }
 

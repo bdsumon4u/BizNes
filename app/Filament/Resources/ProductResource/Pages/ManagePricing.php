@@ -94,10 +94,10 @@ class ManagePricing extends ManageRelatedRecords
                 //
             ])
             ->headerActions([
-            Tables\Actions\CreateAction::make()
-                ->label(__('Add price'))
-                ->slideOver()
-                ->modalWidth('md'),
+                Tables\Actions\CreateAction::make()
+                    ->label(__('Add price'))
+                    ->slideOver()
+                    ->modalWidth('md'),
             ])
             ->actions([
                 Tables\Actions\ReplicateAction::make()

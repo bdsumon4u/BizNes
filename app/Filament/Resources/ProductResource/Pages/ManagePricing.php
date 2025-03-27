@@ -40,10 +40,10 @@ class ManagePricing extends ManageRelatedRecords
                     ->preload()
                     ->required()
                     ->native(false),
-                Forms\Components\TextInput::make('quantity')
+                \LaraZeus\Quantity\Components\Quantity::make('quantity')
                     ->placeholder(__('Minimum quantity'))
-                    ->integer()
                     ->minValue(1)
+                    ->default(1)
                     ->unique('prices', modifyRuleUsing: function (Unique $rule, Forms\Get $get) {
                         $rule->whereIn('customer_group_id', Arr::wrap($get('customer_group_id')))
                             ->where('priceable_type', $this->getRecord()::class)

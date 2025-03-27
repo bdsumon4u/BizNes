@@ -32,6 +32,16 @@ class Variant extends Model implements IMedia
         return $this->belongsTo(Product::class);
     }
 
+    public function purchases()
+    {
+        return $this->morphMany(PurchaseItem::class, 'purchasable');
+    }
+
+    public function stocks()
+    {
+        return $this->morphMany(Stock::class, 'stockable');
+    }
+
     public function registerMediaCollections(): void
     {
         $this->registerMediaCollectionsFromTrait();

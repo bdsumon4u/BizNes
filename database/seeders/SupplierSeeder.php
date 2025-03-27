@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Business;
-use App\Models\Category;
+use App\Models\Supplier;
 use Illuminate\Database\Seeder;
 
-class CategorySeeder extends Seeder
+class SupplierSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Business::all()->each(function (Business $business) {
-            Category::factory(15)->for($business)->create();
+            Supplier::factory(15)->for($business)->create();
         });
     }
 }

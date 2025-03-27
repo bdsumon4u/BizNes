@@ -27,7 +27,7 @@ class Business extends Model implements HasAvatar, HasCurrentTenantLabel
             $business->domain = Str::slug($business->name);
         });
 
-        foreach ([Role::class, Location::class, Brand::class, Category::class, Attribute::class, Product::class, CustomerGroup::class] as $class) {
+        foreach ([Role::class, Location::class, Brand::class, Category::class, Attribute::class, Product::class, CustomerGroup::class, Purchase::class] as $class) {
             static::resolveRelationUsing(str(class_basename($class))->camel()->plural()->toString(), fn (Model $model) => $model->hasMany($class));
         }
     }

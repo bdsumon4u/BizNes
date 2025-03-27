@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\MediaLibrary\HasMedia as IMedia;
 
@@ -50,6 +51,16 @@ class Product extends Model implements IMedia
     public function variants(): HasMany
     {
         return $this->hasMany(Variant::class);
+    }
+
+    public function purchases(): MorphMany
+    {
+        return $this->morphMany(PurchaseItem::class, 'purchasable');
+    }
+
+    public function stocks(): MorphMany
+    {
+        return $this->morphMany(Stock::class, 'stockable');
     }
 
     public function registerMediaCollections(): void

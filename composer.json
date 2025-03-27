@@ -13,6 +13,7 @@
         "filament/filament": "^3.2.135",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "jaocero/radio-deck": "^1.2.9",
+        "lara-zeus/quantity": "^1.0",
         "laravel/framework": "^11.41",
         "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.10.1",

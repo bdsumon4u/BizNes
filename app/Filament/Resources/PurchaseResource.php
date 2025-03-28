@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\LocationType;
 use App\Filament\Resources\PurchaseResource\Pages;
 use App\Models\Purchase;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -25,7 +28,20 @@ class PurchaseResource extends Resource
                     ->relationship('location', 'name')
                     ->searchable()
                     ->required()
-                    ->default(fn () => LocationResource::getEloquentQuery()->where('is_main', true)->value('id')),
+                    ->default(function () {
+                        if (tap(Filament::auth()->user())->isOwner(Filament::getTenant())) {
+                            return LocationResource::getEloquentQuery()->where('is_main', true)->value('id');
+                        }
+
+                        return value(
+                            fn (User $user) => $user->locations()
+                                ->where('business_id', Filament::getTenant()->getKey())
+                                ->where('type', '!=', LocationType::BRANCH)
+                                ->orderByDesc('is_main')
+                                ->value('id'),
+                            Filament::auth()->user()
+                        );
+                    }),
                 Forms\Components\Select::make('supplier_id')
                     ->relationship('supplier', 'name')
                     ->searchable()

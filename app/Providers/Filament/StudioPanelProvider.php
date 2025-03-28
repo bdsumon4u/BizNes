@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Clusters\Tenancy\BusinessSettings;
+use App\Filament\Pages\PointOfSale;
 use App\Filament\Pages\Tenancy\RegisterBusiness;
 use App\Http\Middleware\SetTenantConfig;
 use App\Models\Business;
@@ -112,6 +113,17 @@ class StudioPanelProvider extends PanelProvider
                 class="visit-site"
             >
                 <x-untitledui-google-chrome class="size-6" stroke-width="1.5" aria-hidden="true" />
+            </a>'),
+        );
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::TOPBAR_START,
+            fn () => Blade::render('<a
+                href="'.PointOfSale::getUrl().'"
+                class="point-of-sale"
+                wire:navigate
+                title="PoS"
+            >
+                <x-icon name="'.PointOfSale::getNavigationIcon().'" class="size-6" stroke-width="1.5" aria-hidden="true" />
             </a>'),
         );
     }

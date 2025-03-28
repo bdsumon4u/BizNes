@@ -71,7 +71,7 @@ class LocationResource extends Resource
                     ->label('Main Location')
                     ->helperText('This location will be used as the main location for the business.')
                     ->columnSpanFull()
-                    ->visible(fn (Get $get, Location $record): bool => ! $record->is_main && $get('type') === LocationType::HYBRID->value),
+                    ->visible(fn (Get $get, ?Location $record): bool => ! $record?->is_main && $get('type') === LocationType::HYBRID->value),
             ]);
     }
 

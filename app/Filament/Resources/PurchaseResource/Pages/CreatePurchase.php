@@ -10,7 +10,7 @@ class CreatePurchase extends CreateRecord
 {
     protected static string $resource = PurchaseResource::class;
 
-    protected static string $view = 'filament.pages.purchases.create';
+    // protected static string $view = 'filament.pages.purchases.create';
 
     public function getHeading(): string
     {

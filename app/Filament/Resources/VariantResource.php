@@ -3,13 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantResource\Pages;
-use App\Models\Variant;
+use App\Models\Product;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class VariantResource extends ProductResource
 {
-    protected static ?string $model = Variant::class;
+    protected static ?string $model = Product::class;
 
     protected static ?string $slug = 'products/variants';
 

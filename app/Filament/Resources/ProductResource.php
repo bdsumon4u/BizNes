@@ -151,7 +151,7 @@ class ProductResource extends Resource
                     ->columnSpan(['lg' => 2]),
 
                 Forms\Components\Group::make()
-                    ->schema(static::$model == Product::class ? [
+                    ->schema(static::class == ProductResource::class ? [
                         Forms\Components\Section::make(__('Product availability'))
                             ->collapsible()
                             ->compact()
@@ -293,5 +293,16 @@ class ProductResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (static::class === ProductResource::class) {
+            return $query->whereNull('parent_id');
+        }
+
+        return $query;
     }
 }

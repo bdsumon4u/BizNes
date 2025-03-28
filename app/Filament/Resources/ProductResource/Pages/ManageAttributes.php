@@ -90,8 +90,8 @@ class ManageAttributes extends ManageRelatedRecords
                                     ->descriptions(
                                         AttributeResource::getEloquentQuery()
                                             ->scopes('enabled')
-                                            ->select('id', 'description')
-                                            ->pluck('description', 'id')
+                                            ->get(['id', 'type', 'description'])
+                                            ->mapWithKeys(fn ($attribute) => [$attribute->getKey() => $attribute->description ?? $attribute->type->getLabel()])
                                             ->toArray()
                                     )
                                     ->icons(

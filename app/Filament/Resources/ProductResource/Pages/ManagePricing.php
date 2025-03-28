@@ -46,8 +46,7 @@ class ManagePricing extends ManageRelatedRecords
                     ->default(1)
                     ->unique('prices', modifyRuleUsing: function (Unique $rule, Forms\Get $get) {
                         $rule->whereIn('customer_group_id', Arr::wrap($get('customer_group_id')))
-                            ->where('priceable_type', $this->getRecord()::class)
-                            ->where('priceable_id', $this->getRecord()->getKey());
+                            ->where('product_id', $this->getRecord()->getKey());
                     }, ignoreRecord: true)
                     ->required(),
                 Forms\Components\TextInput::make('amount')

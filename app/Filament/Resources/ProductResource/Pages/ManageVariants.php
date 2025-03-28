@@ -114,11 +114,11 @@ class ManageVariants extends ManageRelatedRecords
                             ])
                             ->toArray();
 
-                        $existingVariants = Variant::query()
+                        $existingVariants = VariantResource::getEloquentQuery()
                             ->with(['options.attribute'])
-                            ->where('product_id', $product->getKey())
+                            ->where('parent_id', $product->getKey())
                             ->get()
-                            ->map(fn (Variant $variant) => [
+                            ->map(fn (Product $variant) => [
                                 'id' => $variant->id,
                                 'sku' => $variant->sku,
                                 'options' => $variant->options->mapWithKeys(
@@ -157,14 +157,14 @@ class ManageVariants extends ManageRelatedRecords
                     ->action(function (Tables\Actions\Action $action, array $data) {
                         DB::beginTransaction();
                         foreach ($data['variants'] as $i => $variantState) {
-                            $variant = Variant::query()->firstOrCreate([
+                            $variant = Product::query()->firstOrCreate([
                                 'id' => $variantState['variant_id'],
                             ], [
                                 'business_id' => Filament::getTenant()->getKey(),
                                 'name' => $variantState['name'],
                                 'position' => $i,
                                 'slug' => Str::slug($variantState['name']),
-                                'product_id' => $this->getRecord()->getKey(),
+                                'parent_id' => $this->getRecord()->getKey(),
                                 'sku' => $variantState['sku'],
                             ]);
 
@@ -192,7 +192,7 @@ class ManageVariants extends ManageRelatedRecords
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->url(fn (Variant $record) => VariantResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Product $record) => VariantResource::getUrl('edit', ['record' => $record])),
                 // Tables\Actions\EditAction::make(),
                 // Tables\Actions\DissociateAction::make(),
                 // Tables\Actions\DeleteAction::make(),

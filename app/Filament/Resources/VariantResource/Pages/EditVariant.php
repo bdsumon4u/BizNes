@@ -4,9 +4,9 @@ namespace App\Filament\Resources\VariantResource\Pages;
 
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\VariantResource;
-use App\Models\Variant;
+use App\Models\Product;
 use Filament\Actions;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EditVariant extends EditProduct
 {
@@ -27,25 +27,17 @@ class EditVariant extends EditProduct
      */
     public function getBreadcrumbs(): array
     {
-        // $resource = static::getResource();
-        $product = $this->getRecord()->product;
+        $resource = parent::getResource();
+        $product = $this->getRecord()->parent;
+
+        throw_unless($product, (new ModelNotFoundException)->setModel(Product::class));
 
         $breadcrumbs = [
-            parent::$resource::getUrl() => parent::$resource::getBreadcrumb(),
-            // $resource::getUrl() => $resource::getBreadcrumb(),
-            parent::$resource::getUrl('edit', ['record' => $product, 'tab' => 'variants']) => $product->name,
+            $resource::getUrl() => $resource::getBreadcrumb(),
+            $resource::getUrl('edit', ['record' => $product, 'tab' => 'variants']) => $product->name,
             $this->getRecord()->name,
         ];
 
-        // if (filled($cluster = static::getCluster())) {
-        //     return $cluster::unshiftClusterBreadcrumbs($breadcrumbs);
-        // }
-
         return $breadcrumbs;
-    }
-
-    protected function resolveRecord(int|string $key): Model
-    {
-        return Variant::findOrFail($key);
     }
 }

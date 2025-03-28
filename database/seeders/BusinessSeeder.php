@@ -17,10 +17,11 @@ class BusinessSeeder extends Seeder
     public function run(): void
     {
         Business::factory(10)
+            ->hasAttached(User::first(), ['is_owner' => true])
             ->hasAttached(User::factory(), ['is_owner' => true])
             ->hasAttached(
                 $users = User::factory(5)->create(),
-                ['is_owner' => Arr::random([true, false])]
+                fn () => ['is_owner' => Arr::random([true, false])]
             )
             ->has(
                 Location::factory(state: [

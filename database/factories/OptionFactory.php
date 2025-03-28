@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Option>
@@ -17,7 +18,8 @@ class OptionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'value' => fake()->unique()->name(),
+            'key' => fn (array $attributes) => Str::slug($attributes['value']),
         ];
     }
 }

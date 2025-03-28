@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('external_id')->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained($table->getTable());
             $table->foreignId('brand_id')->nullable()->constrained();
             $this->addSomeFields($table);
             $table->text('summary')->nullable();
@@ -21,23 +22,12 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_visible')->default(false);
             $table->string('type')->nullable();
+            $table->unsignedInteger('position')->default(0);
 
             $table->shipping_v1($table);
             $table->seo_v1($table);
 
             $table->timestamp('published_at')->useCurrent();
-            $table->timestamps();
-        });
-
-        Schema::create('variants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained();
-            $this->addSomeFields($table);
-            $table->unsignedInteger('position')->default(0);
-
-            $table->shipping_v1($table);
-            $table->json('metadata')->nullable();
-
             $table->timestamps();
         });
 
@@ -54,15 +44,15 @@ return new class extends Migration
             $table->text('value')->nullable();
         });
 
-        Schema::create('option_variant', function (Blueprint $table): void {
+        Schema::create('option_product', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('option_id')->constrained();
-            $table->foreignId('variant_id')->constrained();
+            $table->foreignId('product_id')->constrained();
         });
 
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
-            $table->morphs('priceable');
+            $table->foreignId('product_id')->constrained();
             $table->foreignId('customer_group_id')->constrained();
             $table->unsignedInteger('quantity');
             $table->unsignedInteger('amount')->default(0);
@@ -70,7 +60,7 @@ return new class extends Migration
             $table->unsignedInteger('cost_amount')->default(0);
             $table->timestamps();
 
-            $table->unique(['priceable_id', 'priceable_type', 'customer_group_id', 'quantity'], 'prices_priceable_customer_group_quantity_unique');
+            $table->unique(['product_id', 'customer_group_id', 'quantity']);
         });
     }
 
@@ -80,10 +70,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('prices');
-        Schema::dropIfExists('option_variant');
+        Schema::dropIfExists('option_product');
         Schema::dropIfExists('attribute_product');
         Schema::dropIfExists('product_has_relations');
-        Schema::dropIfExists('variants');
         Schema::dropIfExists('products');
     }
 

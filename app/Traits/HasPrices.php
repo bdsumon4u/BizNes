@@ -3,15 +3,15 @@
 namespace App\Traits;
 
 use App\Models\Price;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 trait HasPrices
 {
     /**
-     * @return MorphMany<Price, $this>
+     * @return HasMany<Price, $this>
      */
-    public function prices(): MorphMany
+    public function prices(): HasMany
     {
-        return $this->morphMany(Price::class, 'priceable');
+        return $this->hasMany(Price::class);
     }
 }

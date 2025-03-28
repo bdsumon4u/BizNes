@@ -8,18 +8,6 @@
     <div
         class="pb-10"
         x-data="{
-            options: [
-                'detail',
-                'media',
-                'price',
-                'files',
-                'attributes',
-                'variants',
-                'inventory',
-                'seo',
-                'shipping',
-                'related'
-            ],
             activeTab: @entangle('activeTab')
         }"
     >
@@ -49,16 +37,15 @@
                     {{ __('Pricing') }}
                 </x-filament::tabs.item>
 
-                @if (true || $record->isVirtual())
-                    <x-filament::tabs.item
-                        alpine-active="activeTab === 'files'"
-                        x-on:click="activeTab = 'files'"
-                        icon="untitledui-paperclip"
-                    >
-                        {{ __('Files') }}
-                    </x-filament::tabs.item>
-                @endif
+                <x-filament::tabs.item
+                    alpine-active="activeTab === 'files'"
+                    x-on:click="activeTab = 'files'"
+                    icon="untitledui-paperclip"
+                >
+                    {{ __('Files') }}
+                </x-filament::tabs.item>
 
+                @if ($record->isStandard())
                 <x-filament::tabs.item
                     alpine-active="activeTab === 'inventory'"
                     x-on:click="activeTab = 'inventory'"
@@ -67,15 +54,22 @@
                     {{ __('Inventory') }}
                 </x-filament::tabs.item>
 
-                @if (true || $record->canUseShipping())
-                    <x-filament::tabs.item
-                        alpine-active="activeTab === 'shipping'"
-                        x-on:click="activeTab = 'shipping'"
-                        icon="untitledui-plane"
-                    >
-                        {{ __('Shipping') }}
-                    </x-filament::tabs.item>
+                <x-filament::tabs.item
+                    alpine-active="activeTab === 'shipping'"
+                    x-on:click="activeTab = 'shipping'"
+                    icon="untitledui-plane"
+                >
+                    {{ __('Shipping') }}
+                </x-filament::tabs.item>
                 @endif
+
+                <x-filament::tabs.item
+                    alpine-active="activeTab === 'options'"
+                    x-on:click="activeTab = 'options'"
+                    icon="untitledui-puzzle-piece"
+                >
+                    {{ __('Options') }}
+                </x-filament::tabs.item>
             </x-filament::tabs>
         </div>
 
@@ -98,31 +92,31 @@
 
                 {{ $form() }}
             </div>
+
             <div x-show="activeTab === 'media'">
                 @livewire(\App\Filament\Resources\VariantResource\Pages\ManageMedia::class, ['record' => $record->getKey()])
             </div>
+
             <div x-show="activeTab === 'price'">
                 @livewire(\App\Filament\Resources\VariantResource\Pages\ManagePricing::class, ['record' => $record->getKey()])
             </div>
 
-            @if (true || $record->isVirtual())
-                <div x-cloak x-show="activeTab === 'files'">
-                    Files
-                </div>
-            @endif
+            <div x-cloak x-show="activeTab === 'files'">
+                Files
+            </div>
 
+            @if ($record->isStandard())
             <div x-cloak x-show="activeTab === 'inventory'">
                 Inventory
             </div>
 
-            @if (true || $record->canUseShipping())
-                <div x-cloak x-show="activeTab === 'shipping'">
-                    @livewire(\App\Filament\Resources\VariantResource\Pages\ManageShipping::class, ['record' => $record->getKey()])
-                </div>
+            <div x-cloak x-show="activeTab === 'shipping'">
+                @livewire(\App\Filament\Resources\VariantResource\Pages\ManageShipping::class, ['record' => $record->getKey()])
+            </div>
             @endif
 
-            <div x-cloak x-show="activeTab === 'related'">
-                Related
+            <div x-cloak x-show="activeTab === 'options'">
+                @livewire(\App\Filament\Resources\VariantResource\Pages\ManageOptions::class, ['record' => $record->getKey()])
             </div>
         </div>
     </div>

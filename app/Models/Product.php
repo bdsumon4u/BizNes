@@ -31,6 +31,16 @@ class Product extends Model implements IMedia
         ];
     }
 
+    public function isStandard(): bool
+    {
+        return $this->type === ProductType::Standard;
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'parent_id');
+    }
+
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
@@ -48,9 +58,14 @@ class Product extends Model implements IMedia
             ->using(AttributeProduct::class);
     }
 
+    public function options(): BelongsToMany
+    {
+        return $this->belongsToMany(Option::class);
+    }
+
     public function variants(): HasMany
     {
-        return $this->hasMany(Variant::class);
+        return $this->hasMany(Product::class, 'parent_id');
     }
 
     public function purchases(): MorphMany

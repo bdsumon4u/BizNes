@@ -14,7 +14,10 @@ class SupplierSeeder extends Seeder
     public function run(): void
     {
         Business::all()->each(function (Business $business) {
-            Supplier::factory(15)->for($business)->create();
+            Supplier::factory(state: [
+                'name' => __('Default'),
+            ])->for($business)->create();
+            Supplier::factory(14)->for($business)->create();
         });
     }
 }

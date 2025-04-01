@@ -4,8 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Enum\LocationType;
 use App\Filament\Resources\PurchaseResource\Pages;
+use App\Forms\Components\ProductSelect;
+use App\Forms\Components\TextInputSelect;
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\User;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -13,6 +18,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
+use LaraZeus\Quantity\Components\Quantity;
 
 class PurchaseResource extends Resource
 {
@@ -25,7 +32,10 @@ class PurchaseResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('location_id')
-                    ->relationship('location', 'name')
+                    ->relationship('location', 'name', modifyQueryUsing: function ($query) {
+                        return $query->where('business_id', Filament::getTenant()->getKey())
+                            ->where('type', '!=', LocationType::BRANCH);
+                    })
                     ->searchable()
                     ->required()
                     ->default(function () {
@@ -43,7 +53,9 @@ class PurchaseResource extends Resource
                         );
                     }),
                 Forms\Components\Select::make('supplier_id')
-                    ->relationship('supplier', 'name')
+                    ->relationship('supplier', 'name', modifyQueryUsing: function ($query) {
+                        return $query->where('business_id', Filament::getTenant()->getKey());
+                    })
                     ->searchable()
                     ->required()
                     ->createOptionForm(fn (Form $form) => SupplierResource::form($form))
@@ -52,8 +64,6 @@ class PurchaseResource extends Resource
                     ->default(now())
                     ->required()
                     ->native(false),
-                Forms\Components\Hidden::make('amount')
-                    ->default(0),
             ])
             ->columns(3);
     }

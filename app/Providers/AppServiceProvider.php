@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         URL::forceHttps(app()->isProduction());
         Model::unguard();
         Number::useCurrency('BDT');
-        Table::$defaultCurrency = 'bdt';
+        Table::$defaultCurrency = Number::defaultCurrency();
         Table::$defaultDateDisplayFormat = 'd-M-Y';
         Table::$defaultTimeDisplayFormat = 'h:i:s A';
         Table::$defaultDateTimeDisplayFormat = 'd-M-Y h:i:s A';

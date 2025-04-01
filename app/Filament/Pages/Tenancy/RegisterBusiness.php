@@ -18,12 +18,9 @@ class RegisterBusiness extends RegisterTenant
     /**
      * @var view-string
      */
-    protected static string $layout = 'filament.components.layout.simple';
-
-    /**
-     * @var view-string
-     */
     protected static string $view = 'filament.pages.tenancy.register-business';
+
+    protected ?string $maxWidth = 'full';
 
     public static function getLabel(): string
     {

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained($table->getTable());
             $table->foreignId('brand_id')->nullable()->constrained();
             $this->addSomeFields($table);
-            $table->text('summary')->nullable();
+            $table->text('summary')->nullable()->fulltext();
             $table->longText('description')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_visible')->default(false);

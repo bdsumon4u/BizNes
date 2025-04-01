@@ -2,328 +2,260 @@
     'fi-resource-create-record-page',
     'fi-resource-' . str_replace('/', '-', $this->getResource()::getSlug()),
 ])>
-    <x-filament-panels::form id="form" :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
-        wire:submit="create">
-        <!-- component -->
-        <div class="flex flex-col-reverse lg:flex-row">
-            <!-- left section -->
-            <div class="w-full min-h-screen shadow-lg lg:w-3/5">
-                <!-- header -->
-                <div class="flex flex-row items-center justify-between px-5 mt-5">
-                    <div class="text-gray-800">
-                        <div class="text-xl font-bold">Simons's BQQ Team</div>
-                        <span class="text-xs">Location ID#SIMON123</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="mr-4 text-sm text-center">
-                            <div class="font-light text-gray-500">last synced</div>
-                            <span class="font-semibold">3 mins ago</span>
-                        </div>
-                        <div>
-                            <span class="px-4 py-2 font-semibold text-gray-800 bg-gray-200 rounded">
-                                Help
-                        </div>
-                        </span>
-                    </div>
-                </div>
-                <!-- end header -->
-                <!-- categories -->
-                <div class="flex flex-row px-5 mt-5">
-                    <span class="px-5 py-1 mr-4 text-sm text-white bg-yellow-500 rounded-2xl">
-                        All items
-                    </span>
-                    <span class="px-5 py-1 mr-4 text-sm font-semibold rounded-2xl">
-                        Food
-                    </span>
-                    <span class="px-5 py-1 mr-4 text-sm font-semibold rounded-2xl">
-                        Cold Drinks
-                    </span>
-                    <span class="px-5 py-1 mr-4 text-sm font-semibold rounded-2xl">
-                        Hot Drinks
-                    </span>
-                </div>
-                <!-- end categories -->
-                <!-- products -->
-                <div class="grid grid-cols-3 gap-4 px-5 mt-5 overflow-y-auto h-3/4">
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/sc5sTPMrVfk/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Ranch Burger</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$7.00</span>
-                            <img src="https://source.unsplash.com/sc5sTPMrVfk/600x500"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Pizza Bacon</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/sc5sTPMrVfk/500x500"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between h-32 px-3 py-3 border border-gray-200 rounded-md">
-                        <div>
-                            <div class="font-bold text-gray-800">Griled corn</div>
-                            <span class="text-sm font-light text-gray-400">150g</span>
-                        </div>
-                        <div class="flex flex-row items-center justify-between">
-                            <span class="self-end text-lg font-bold text-yellow-500">$1.75</span>
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover rounded-md h-14 w-14" alt="">
-                        </div>
-                    </div>
-                </div>
-                <!-- end products -->
-            </div>
-            <!-- end left section -->
-            <!-- right section -->
-            <div class="w-full lg:w-2/5">
-                <!-- header -->
-                <div class="flex flex-row items-center justify-between px-5 mt-5">
-                    <div class="text-xl font-bold">Current Order</div>
-                    <div class="font-semibold">
-                        <span class="px-4 py-2 text-red-500 bg-red-100 rounded-md">Clear All</span>
-                        <span class="px-4 py-2 text-gray-800 bg-gray-100 rounded-md">Setting</span>
-                    </div>
-                </div>
-                <!-- end header -->
-                <!-- order list -->
-                <div class="h-64 px-5 py-4 mt-5 overflow-y-auto">
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/4u_nRgiLW3M/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Stuffed flank steak</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">-</span>
-                            <span class="mx-4 font-semibold">2</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $13.50
-                        </div>
-                    </div>
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/sc5sTPMrVfk/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Grilled Corn</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">-</span>
-                            <span class="mx-4 font-semibold">10</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $3.50
-                        </div>
-                    </div>
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Grilled Corn</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">-</span>
-                            <span class="mx-4 font-semibold">10</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $3.50
-                        </div>
-                    </div>
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Grilled Corn</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">-</span>
-                            <span class="mx-4 font-semibold">10</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $3.50
-                        </div>
-                    </div>
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/MNtag_eXMKw/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Ranch Burger</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 text-white bg-red-300 rounded-md">x</span>
-                            <span class="mx-4 font-semibold">1</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $2.50
-                        </div>
-                    </div>
-                    <div class="flex flex-row items-center justify-between mb-4">
-                        <div class="flex flex-row items-center w-2/5">
-                            <img src="https://source.unsplash.com/4u_nRgiLW3M/600x600"
-                                class="object-cover w-10 h-10 rounded-md" alt="">
-                            <span class="ml-4 text-sm font-semibold">Ranch Burger</span>
-                        </div>
-                        <div class="flex justify-between w-32">
-                            <span class="px-3 py-1 text-white bg-red-300 rounded-md">x</span>
-                            <span class="mx-4 font-semibold">1</span>
-                            <span class="px-3 py-1 bg-gray-300 rounded-md ">+</span>
-                        </div>
-                        <div class="w-16 text-lg font-semibold text-center">
-                            $2.50
-                        </div>
-                    </div>
-                </div>
-                <!-- end order list -->
-                <!-- totalItems -->
-                <div class="px-5 mt-5">
-                    <div class="py-4 rounded-md shadow-lg">
-                        <div class="flex justify-between px-4 ">
-                            <span class="text-sm font-semibold">Subtotal</span>
-                            <span class="font-bold">$35.25</span>
-                        </div>
-                        <div class="flex justify-between px-4 ">
-                            <span class="text-sm font-semibold">Discount</span>
-                            <span class="font-bold">- $5.00</span>
-                        </div>
-                        <div class="flex justify-between px-4 ">
-                            <span class="text-sm font-semibold">Sales Tax</span>
-                            <span class="font-bold">$2.25</span>
-                        </div>
-                        <div class="flex items-center justify-between px-4 py-2 mt-3 border-t-2">
-                            <span class="text-2xl font-semibold">Total</span>
-                            <span class="text-2xl font-bold">$37.50</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- end total -->
-                <!-- cash -->
-                <div class="px-5 mt-5">
-                    <div class="px-4 py-4 rounded-md shadow-lg">
-                        <div class="flex flex-row items-center justify-between">
-                            <div class="flex flex-col">
-                                <span class="text-xs font-semibold uppercase">cashless credit</span>
-                                <span class="text-xl font-bold text-yellow-500">$32.50</span>
-                                <span class="text-xs text-gray-400 ">Available</span>
-                            </div>
-                            <div class="px-4 py-3 font-bold text-gray-800 bg-gray-300 rounded-md"> Cancel</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end cash -->
-                <!-- button pay-->
-                <div class="px-5 mt-5">
-                    <div class="px-4 py-4 font-semibold text-center text-white bg-yellow-500 rounded-md shadow-lg">
-                        Pay With Cashless Credit
-                    </div>
-                </div>
-                <!-- end button pay -->
-            </div>
-            <!-- end right section -->
-        </div>
+    <div x-data="{
+        products: [],
+        search: '',
+        searchResults: $wire.entangle('searchResults'),
+        globalDiscount: 0,
+        globalDiscountType: 'fixed',
+    
+        addProduct(product) {
+            const existingProduct = this.products.find(p => p.id === product.id);
+    
+            if (existingProduct) {
+                existingProduct.quantity++;
+            } else {
+                this.products.unshift({
+                    id: product.id,
+                    name: product.name,
+                    image: product.image,
+                    quantity: 1,
+                    price: product.price || 0,
+                    discount: 0,
+                    discount_type: 'fixed'
+                });
+            }
+    
+            this.search = '';
+            this.searchResults = [];
+            $wire.set('searchResults', []);
+            $wire.set('data.search', '');
+        },
+    
+        calculateSubtotal(product) {
+            const subtotal = product.quantity * product.price;
+            if (product.discount_type === 'fixed') {
+                return subtotal - (product.discount * product.quantity);
+            }
+            return subtotal - (subtotal * (product.discount / 100));
+        },
+    
+        calculateTotal() {
+            return this.products.reduce((total, product) => total + this.calculateSubtotal(product), 0);
+        },
+    
+        calculateGlobalDiscount() {
+            const subtotal = this.calculateTotal();
+            if (this.globalDiscountType === 'fixed') {
+                return parseFloat(this.globalDiscount) || 0;
+            }
+            return subtotal * (parseFloat(this.globalDiscount) || 0) / 100;
+        },
+    
+        calculateFinalTotal() {
+            return this.calculateTotal() - this.calculateGlobalDiscount();
+        }
+    }" class="space-y-6">
+        <x-filament-panels::form id="form" :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
+            wire:submit="create"
+            @submit.prevent="$wire.set('purchaseItems', products); $wire.set('data.global_discount', globalDiscount); $wire.set('data.global_discount_type', globalDiscountType); $wire.set('data.final_amount', calculateFinalTotal())">
+            <!-- Search Input -->
+            <div class="relative">
+                <div class="relative">
+                    {{ $this->form }}
 
-        <x-filament-panels::form.actions :actions="$this->getCachedFormActions()" :full-width="$this->hasFullWidthFormActions()" />
-    </x-filament-panels::form>
+                    <!-- Search Results Dropdown -->
+                    <div x-show="$wire.searchResults.length > 0" x-cloak
+                        class="absolute z-50 w-full mt-1 overflow-hidden bg-white border rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
+                        <template x-for="product in $wire.searchResults" :key="product.id">
+                            <div @click="addProduct(product); $nextTick(() => { document.getElementById('data.search').focus() })"
+                                class="flex items-center p-2 transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <img width="50" height="50" :src="product.image" :alt="product.name" />
+                                <span class="text-gray-700 dark:text-gray-200" x-text="product.name"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="overflow-hidden bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap dark:text-gray-400">
+                                    Product</th>
+                                <th
+                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap dark:text-gray-400">
+                                    Quantity</th>
+                                <th
+                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap dark:text-gray-400">
+                                    Unit Price</th>
+                                <th
+                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap dark:text-gray-400">
+                                    Unit Discount</th>
+                                <th
+                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap dark:text-gray-400">
+                                    Subtotal</th>
+                                <th class="px-6 py-3 text-right whitespace-nowrap"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <template x-for="(product, index) in products" :key="product.id">
+                                <tr class="transition duration-150 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td class="p-2 text-sm text-gray-700 dark:text-gray-200">
+                                        <div
+                                            class="flex items-center transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <img width="50" height="50" :src="product.image"
+                                                :alt="product.name" />
+                                            <div>
+                                                <p class="font-semibold text-gray-700 dark:text-gray-200 line-clamp-3" x-text="product.name"></span>
+                                                <div>
+                                                    <label>Expiry Date</label>
+                                                    <input type="date" class="px-3 py-1" name="expires_at" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <button type="button" @click="if(product.quantity > 1) product.quantity--" tabindex="-1"
+                                                class="p-1 border border-r-0 border-gray-300 rounded-l dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <x-tabler-minus class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            </button>
+                                            <input type="number" x-model="product.quantity" min="1"
+                                                class="w-16 px-2 py-1 text-center border-gray-300 border-y dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                                @focus="$event.target.select()">
+                                            <button type="button" @click="product.quantity++" tabindex="-1"
+                                                class="p-1 border border-l-0 border-gray-300 rounded-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <x-tabler-plus class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="relative w-32">
+                                            <input type="number" x-model="product.price" min="0"
+                                                class="w-full px-3 py-1 border border-gray-300 rounded ps-8 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                                @focus="$event.target.select()">
+                                            <div
+                                                class="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-2">
+                                                <x-tabler-currency-taka class="w-4 h-4" />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center space-x-1">
+                                            <input type="number" x-model="product.discount" min="0"
+                                                class="w-24 px-3 py-1 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                                @focus="$event.target.select()">
+                                            <button type="button"
+                                                @click="product.discount_type = product.discount_type === 'fixed' ? 'percent' : 'fixed'"
+                                                class="p-1 transition-colors duration-150 bg-gray-100 rounded dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                                                <span class="text-gray-700 dark:text-gray-200">
+                                                    <x-tabler-currency-taka class="w-5 h-5"
+                                                        x-show="product.discount_type == 'fixed'" />
+                                                    <x-tabler-percentage class="w-5 h-5"
+                                                        x-show="product.discount_type != 'fixed'" />
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap dark:text-gray-200">
+                                        <div class="flex items-center">
+                                            <x-tabler-currency-taka class="w-5 h-5" />
+                                            <span x-text="calculateSubtotal(product).toFixed(2)"></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                                        <button type="button" @click="products.splice(index, 1)"
+                                            class="text-red-600 transition duration-150 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                            <x-tabler-trash class="w-5 h-5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr x-show="products.length === 0">
+                                <td colspan="6" class="px-6 py-8 text-center">
+                                    <div
+                                        class="flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-400">
+                                        <x-tabler-shopping-cart class="w-8 h-8" />
+                                        <p class="text-sm font-medium">No products added to purchase</p>
+                                        <p class="text-xs">Search and select products to add them to your purchase</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Replace the entire summary section with this new design -->
+            <div class="overflow-hidden bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="p-2">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <!-- Subtotal Card -->
+                        <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Subtotal</span>
+                                <x-tabler-trending-up class="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <div class="flex items-center mt-2 text-gray-500 dark:text-gray-400">
+                                <x-tabler-currency-taka />
+                                <span class="text-2xl font-bold" x-text="calculateTotal().toFixed(2)"></span>
+                            </div>
+                        </div>
+
+                        <!-- Discount Card with Input -->
+                        <div class="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-medium text-red-600 dark:text-red-400">Discount</span>
+                                <x-tabler-info-circle class="w-5 h-5 text-red-500 dark:text-red-400" />
+                            </div>
+                            <div class="relative flex justify-between">
+                                <div class="flex items-center">
+                                    <div class="relative flex-1">
+                                        <div class="flex items-center space-x-1">
+                                            <input type="number" x-model="globalDiscount" min="0"
+                                                class="w-24 px-3 py-1 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                                @focus="$event.target.select()">
+                                            <button type="button"
+                                                @click="globalDiscountType = globalDiscountType === 'fixed' ? 'percent' : 'fixed'"
+                                                class="p-1 transition-colors duration-150 bg-gray-100 rounded dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                                                <span class="text-gray-700 dark:text-gray-200">
+                                                    <x-tabler-currency-taka x-show="globalDiscountType == 'fixed'" />
+                                                    <x-tabler-percentage x-show="globalDiscountType != 'fixed'" />
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-xs font-medium text-red-500 gap-x-2 dark:text-red-400">
+                                    Applied: <span x-text="'- ' + calculateGlobalDiscount().toFixed(2)"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Final Total Card -->
+                        <div class="p-2 rounded-lg bg-primary-50 dark:bg-primary-900/20">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-primary-600 dark:text-primary-400">Final
+                                    Total</span>
+                                <x-tabler-cash class="w-5 h-5 text-primary-400 dark:text-primary-500" />
+                            </div>
+                            <div class="flex items-center justify-end mt-2 text-primary-600 dark:text-primary-400">
+                                <x-tabler-currency-taka />
+                                <span class="text-2xl font-bold" x-text="calculateFinalTotal().toFixed(2)"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <x-filament-panels::form.actions :actions="$this->getCachedFormActions()" :full-width="$this->hasFullWidthFormActions()" />
+        </x-filament-panels::form>
+    </div>
 
     <x-filament-panels::page.unsaved-data-changes-alert />
 </x-filament-panels::page>

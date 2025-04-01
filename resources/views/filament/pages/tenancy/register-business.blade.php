@@ -1,3 +1,11 @@
+@push('styles')
+    <style>
+        .fi-simple-main {
+            margin: 0;
+        }
+    </style>
+@endpush
+
 <div class="min-h-screen lg:grid lg:grid-cols-5 lg:gap-x-20">
     <main class="max-w-4xl px-4 py-12 mx-auto sm:px-6 sm:py-20 lg:col-span-3 lg:max-w-xl">
         <x-filament-panels::form id="form" wire:submit="register">
@@ -6,38 +14,26 @@
     </main>
     <div class="hidden min-h-full p-1.5 lg:col-span-2 lg:flex">
         <div
-            class="relative flex flex-1 pt-32 pl-32 overflow-hidden rounded-2xl ring-1 ring-gray-950/10 bg-gray-50 dark:ring-white/20 dark:bg-gray-800"
-        >
-            <svg
-                class="absolute inset-0 h-full w-full stroke-gray-200 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)] dark:stroke-gray-900"
-                aria-hidden="true"
-            >
+            class="relative flex flex-1 pt-32 pl-32 overflow-hidden rounded-2xl ring-1 ring-gray-950/10 bg-gray-50 dark:ring-white/20 dark:bg-gray-800">
+            <svg class="absolute inset-0 h-full w-full stroke-gray-200 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)] dark:stroke-gray-900"
+                aria-hidden="true">
                 <defs>
-                    <pattern
-                        id="55d3d46d-692e-45f2-becd-d8bdc9344f45"
-                        width="250"
-                        height="250"
-                        x="50%"
-                        y="0"
-                        patternUnits="userSpaceOnUse"
-                    >
+                    <pattern id="55d3d46d-692e-45f2-becd-d8bdc9344f45" width="250" height="250" x="50%" y="0"
+                        patternUnits="userSpaceOnUse">
                         <path d="M.5 200V.5H200" fill="none" />
                     </pattern>
                 </defs>
                 <svg x="50%" y="0" class="overflow-visible fill-gray-50 dark:fill-gray-900">
                     <path
                         d="M-200.5 0h201v201h-201Z M599.5 0h201v201h-201Z M399.5 400h201v201h-201Z M-400.5 600h201v201h-201Z"
-                        stroke-width="0"
-                    />
+                        stroke-width="0" />
                 </svg>
-                <rect width="100%" height="100%" stroke-width="0" fill="url(#55d3d46d-692e-45f2-becd-d8bdc9344f45)" />
+                <rect width="100%" height="100%" stroke-width="0"
+                    fill="url(#55d3d46d-692e-45f2-becd-d8bdc9344f45)" />
             </svg>
-            <div
-                class="absolute inset-x-0 flex justify-center overflow-hidden top-10 transform-gpu blur-3xl"
-                aria-hidden="true"
-            >
-                <div
-                    class="aspect-[1108/632] w-[69.25rem] flex-none bg-gradient-to-r from-primary-400 to-primary-600 opacity-20 dark:from-primary-200 dark:to-primary-500"
+            <div class="absolute inset-x-0 flex justify-center overflow-hidden top-10 transform-gpu blur-3xl"
+                aria-hidden="true">
+                <div class="aspect-[1108/632] w-[69.25rem] flex-none bg-gradient-to-r from-primary-400 to-primary-600 opacity-20 dark:from-primary-200 dark:to-primary-500"
                     style="
                         clip-path: polygon(
                             73.6% 51.7%,
@@ -57,16 +53,15 @@
                             58.9% 0.2%,
                             73.6% 51.7%
                         );
-                    "
-                ></div>
+                    ">
+                </div>
             </div>
             <div class="relative flex w-full h-full bg-white shadow-xl rounded-tl-2xl dark:bg-gray-900">
                 <div class="p-8">
                     <img src="{{ asset('imgs/icon.svg') }}" alt="Brand" class="size-10" />
                 </div>
                 <div
-                    class="flex-1 pl-4 border-l border-gray-100 divide-y divide-gray-100 dark:divide-white/10 dark:border-white/10"
-                >
+                    class="flex-1 pl-4 border-l border-gray-100 divide-y divide-gray-100 dark:divide-white/10 dark:border-white/10">
                     <div class="px-5 py-8">
                         <h2 class="text-xl font-bold text-gray-900 font-heading dark:text-white">
                             {{ config('app.name') }}
@@ -78,10 +73,8 @@
                                 @foreach (range(0, 8) as $value)
                                     <li class="flex items-center space-x-2 animate-pulse">
                                         <div class="w-3 h-3 bg-gray-100 rounded-full dark:bg-gray-800"></div>
-                                        <span
-                                            class="w-1/2 h-3 bg-gray-100 rounded-full dark:bg-gray-800"
-                                            style="width: {{ collect(range(1, 8))->shuffle()->first() * 10 }}%"
-                                        ></span>
+                                        <span class="w-1/2 h-3 bg-gray-100 rounded-full dark:bg-gray-800"
+                                            style="width: {{ collect(range(1, 8))->shuffle()->first() * 10 }}%"></span>
                                     </li>
                                 @endforeach
                             </ul>

@@ -21,12 +21,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('purchase_items', function (Blueprint $table) {
+        Schema::create('product_purchase', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained();
             $table->foreignId('purchase_id')->constrained();
-            $table->morphs('purchasable');
-            $table->unsignedInteger('price');
             $table->unsignedInteger('quantity');
+            $table->unsignedInteger('price');
+            $table->unsignedInteger('discount')->default(0);
+            $table->string('discount_type')->nullable();
             $table->date('expiry_date')->nullable()->index();
             $table->timestamps();
         });
@@ -34,13 +36,13 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('location_id')->constrained();
-            $table->morphs('stockable');
+            $table->foreignId('product_id')->constrained();
             $table->unsignedInteger('price');
             $table->unsignedInteger('quantity');
             $table->date('expiry_date')->nullable()->index();
             $table->timestamps();
 
-            $table->unique(['location_id', 'stockable_id', 'stockable_type', 'expiry_date'], 'stocks_location_stockable_expiry_date_unique');
+            $table->unique(['location_id', 'product_id', 'expiry_date']);
         });
     }
 

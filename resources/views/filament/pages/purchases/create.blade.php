@@ -8,9 +8,37 @@
         searchResults: $wire.entangle('searchResults'),
         globalDiscount: 0,
         globalDiscountType: 'fixed',
+        additionalCost: 0,
+        additionalCostNote: '',
+    
+        validateProductDiscount(product) {
+            if (product.discount_type === 'fixed') {
+                const maxDiscount = product.price * product.quantity;
+                if (product.discount > maxDiscount) {
+                    product.discount = maxDiscount;
+                }
+            } else if (product.discount_type === 'percent') {
+                if (product.discount > 100) {
+                    product.discount = 100;
+                }
+            }
+        },
+    
+        validateGlobalDiscount() {
+            if (this.globalDiscountType === 'fixed') {
+                const subtotal = this.calculateTotal();
+                if (this.globalDiscount > subtotal) {
+                    this.globalDiscount = subtotal;
+                }
+            } else if (this.globalDiscountType === 'percent') {
+                if (this.globalDiscount > 100) {
+                    this.globalDiscount = 100;
+                }
+            }
+        },
     
         addProduct(product) {
-            const existingProduct = this.products.find(p => p.id === product.id);
+            const existingProduct = this.products.find(p => (p.id === product.id) && !p.expiry_date);
     
             if (existingProduct) {
                 existingProduct.quantity++;
@@ -22,7 +50,8 @@
                     quantity: 1,
                     price: product.price || 0,
                     discount: 0,
-                    discount_type: 'fixed'
+                    discount_type: 'fixed',
+                    expiry_date: null,
                 });
             }
     
@@ -53,7 +82,7 @@
         },
     
         calculateFinalTotal() {
-            return this.calculateTotal() - this.calculateGlobalDiscount();
+            return this.calculateTotal() - this.calculateGlobalDiscount() + parseFloat(this.additionalCost || 0);
         }
     }" class="space-y-6">
         <x-filament-panels::form id="form" :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
@@ -67,7 +96,7 @@
                     <!-- Search Results Dropdown -->
                     <div x-show="$wire.searchResults.length > 0" x-cloak
                         class="absolute z-50 w-full mt-1 overflow-hidden bg-white border rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
-                        <template x-for="product in $wire.searchResults" :key="product.id">
+                        <template x-for="product in $wire.searchResults">
                             <div @click="addProduct(product); $nextTick(() => { document.getElementById('data.search').focus() })"
                                 class="flex items-center p-2 transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <img width="50" height="50" :src="product.image" :alt="product.name" />
@@ -103,30 +132,29 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <template x-for="(product, index) in products" :key="product.id">
+                            <template x-for="(product, index) in products">
                                 <tr class="transition duration-150 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="p-2 text-sm text-gray-700 dark:text-gray-200">
                                         <div
-                                            class="flex items-center transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <img width="50" height="50" :src="product.image"
+                                            class="min-w-[20rem] flex items-center transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <img width="80" height="80" :src="product.image"
                                                 :alt="product.name" />
                                             <div>
-                                                <p class="font-semibold text-gray-700 dark:text-gray-200 line-clamp-3" x-text="product.name"></span>
-                                                <div>
-                                                    <label>Expiry Date</label>
-                                                    <input type="date" class="px-3 py-1" name="expires_at" />
-                                                </div>
+                                                <p class="font-semibold text-gray-700 dark:text-gray-200 line-clamp-3"
+                                                    x-text="product.name"></span>
+                                                    <x-datepicker placeholder="Expiry Date" model="product.expiry_date" />
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="p-2 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <button type="button" @click="if(product.quantity > 1) product.quantity--" tabindex="-1"
+                                            <button type="button" @click="if(product.quantity > 1) product.quantity--"
+                                                tabindex="-1"
                                                 class="p-1 border border-r-0 border-gray-300 rounded-l dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <x-tabler-minus class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             </button>
                                             <input type="number" x-model="product.quantity" min="1"
-                                                class="w-16 px-2 py-1 text-center border-gray-300 border-y dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                                class="w-20 px-2 py-1 text-center border-gray-300 border-y dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
                                                 @focus="$event.target.select()">
                                             <button type="button" @click="product.quantity++" tabindex="-1"
                                                 class="p-1 border border-l-0 border-gray-300 rounded-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -134,7 +162,7 @@
                                             </button>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="p-2 whitespace-nowrap">
                                         <div class="relative w-32">
                                             <input type="number" x-model="product.price" min="0"
                                                 class="w-full px-3 py-1 border border-gray-300 rounded ps-8 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
@@ -145,13 +173,14 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="p-2 whitespace-nowrap">
                                         <div class="flex items-center space-x-1">
                                             <input type="number" x-model="product.discount" min="0"
+                                                @input="validateProductDiscount(product)"
                                                 class="w-24 px-3 py-1 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
                                                 @focus="$event.target.select()">
                                             <button type="button"
-                                                @click="product.discount_type = product.discount_type === 'fixed' ? 'percent' : 'fixed'"
+                                                @click="product.discount_type = product.discount_type === 'fixed' ? 'percent' : 'fixed'; validateProductDiscount(product)"
                                                 class="p-1 transition-colors duration-150 bg-gray-100 rounded dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
                                                 <span class="text-gray-700 dark:text-gray-200">
                                                     <x-tabler-currency-taka class="w-5 h-5"
@@ -162,13 +191,13 @@
                                             </button>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap dark:text-gray-200">
+                                    <td class="p-2 text-sm text-gray-700 whitespace-nowrap dark:text-gray-200">
                                         <div class="flex items-center">
                                             <x-tabler-currency-taka class="w-5 h-5" />
                                             <span x-text="calculateSubtotal(product).toFixed(2)"></span>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                                    <td class="p-2 text-right whitespace-nowrap">
                                         <button type="button" @click="products.splice(index, 1)"
                                             class="text-red-600 transition duration-150 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
                                             <x-tabler-trash class="w-5 h-5" />
@@ -194,7 +223,7 @@
             <!-- Replace the entire summary section with this new design -->
             <div class="overflow-hidden bg-white rounded-lg shadow dark:bg-gray-800">
                 <div class="p-2">
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-7">
                         <!-- Subtotal Card -->
                         <div class="p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                             <div class="flex items-center justify-between">
@@ -203,12 +232,12 @@
                             </div>
                             <div class="flex items-center mt-2 text-gray-500 dark:text-gray-400">
                                 <x-tabler-currency-taka />
-                                <span class="text-2xl font-bold" x-text="calculateTotal().toFixed(2)"></span>
+                                <span class="text-xl font-bold" x-text="calculateTotal().toFixed(2)"></span>
                             </div>
                         </div>
 
                         <!-- Discount Card with Input -->
-                        <div class="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+                        <div class="p-2 rounded-lg md:col-span-2 bg-red-50 dark:bg-red-900/20">
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-sm font-medium text-red-600 dark:text-red-400">Discount</span>
                                 <x-tabler-info-circle class="w-5 h-5 text-red-500 dark:text-red-400" />
@@ -218,10 +247,11 @@
                                     <div class="relative flex-1">
                                         <div class="flex items-center space-x-1">
                                             <input type="number" x-model="globalDiscount" min="0"
+                                                @input="validateGlobalDiscount()"
                                                 class="w-24 px-3 py-1 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
                                                 @focus="$event.target.select()">
                                             <button type="button"
-                                                @click="globalDiscountType = globalDiscountType === 'fixed' ? 'percent' : 'fixed'"
+                                                @click="globalDiscountType = globalDiscountType === 'fixed' ? 'percent' : 'fixed'; validateGlobalDiscount()"
                                                 class="p-1 transition-colors duration-150 bg-gray-100 rounded dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
                                                 <span class="text-gray-700 dark:text-gray-200">
                                                     <x-tabler-currency-taka x-show="globalDiscountType == 'fixed'" />
@@ -237,6 +267,28 @@
                             </div>
                         </div>
 
+                        <!-- Additional Cost Card -->
+                        <div class="p-2 rounded-lg md:col-span-3 bg-yellow-50 dark:bg-yellow-900/20">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-medium text-yellow-600 dark:text-yellow-400">Additional
+                                    Cost</span>
+                                <x-tabler-truck class="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-x-1">
+                                <div class="relative w-32">
+                                    <input type="number" x-model="additionalCost" min="0"
+                                        class="w-full px-3 py-1 border border-gray-300 rounded ps-8 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                        placeholder="Enter amount" @focus="$event.target.select()">
+                                    <div class="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-2">
+                                        <x-tabler-currency-taka class="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <input type="text" x-model="additionalCostNote"
+                                    class="w-full px-3 py-1 text-sm border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
+                                    placeholder="Note (optional)">
+                            </div>
+                        </div>
+
                         <!-- Final Total Card -->
                         <div class="p-2 rounded-lg bg-primary-50 dark:bg-primary-900/20">
                             <div class="flex items-center justify-between">
@@ -246,7 +298,7 @@
                             </div>
                             <div class="flex items-center justify-end mt-2 text-primary-600 dark:text-primary-400">
                                 <x-tabler-currency-taka />
-                                <span class="text-2xl font-bold" x-text="calculateFinalTotal().toFixed(2)"></span>
+                                <span class="text-xl font-bold" x-text="calculateFinalTotal().toFixed(2)"></span>
                             </div>
                         </div>
                     </div>

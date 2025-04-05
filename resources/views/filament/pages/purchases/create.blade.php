@@ -3,13 +3,15 @@
     'fi-resource-' . str_replace('/', '-', $this->getResource()::getSlug()),
 ])>
     <div x-data="{
-        products: [],
+        products: $wire.entangle('purchaseItems'),
         search: '',
         searchResults: $wire.entangle('searchResults'),
-        globalDiscount: 0,
-        globalDiscountType: 'fixed',
+        globalDiscount: $wire.entangle('globalDiscount'),
+        globalDiscountType: $wire.entangle('globalDiscountType'),
         additionalCost: 0,
         additionalCostNote: '',
+        errors: $wire.entangle('errorMessages'),
+        formSubmitted: false,
     
         validateProductDiscount(product) {
             if (product.discount_type === 'fixed') {
@@ -47,9 +49,9 @@
                     id: product.id,
                     name: product.name,
                     image: product.image,
-                    quantity: 1,
-                    price: product.price || 0,
-                    discount: 0,
+                    quantity: -5, // 1,
+                    price: -5, // product.price || 0,
+                    discount: -5, // 0,
                     discount_type: 'fixed',
                     expiry_date: null,
                 });
@@ -83,11 +85,107 @@
     
         calculateFinalTotal() {
             return this.calculateTotal() - this.calculateGlobalDiscount() + parseFloat(this.additionalCost || 0);
+        },
+    
+        validateForm() {
+            this.formSubmitted = true;
+            this.errors = {}; // Reset errors
+            let isValid = true;
+    
+            // Client-side validation
+            if (this.products.length === 0) {
+                this.errors['purchaseItems'] = ['Please add at least one product to the purchase'];
+                isValid = false;
+            }
+    
+            // Validate each product
+            for (const [index, product] of this.products.entries()) {
+                if (!product.id || !product.quantity || product.quantity < 1) {
+                    this.errors[`purchaseItems.${index}.quantity`] = ['Quantity must be at least 1'];
+                    isValid = false;
+                }
+    
+                if (product.price < 0) {
+                    this.errors[`purchaseItems.${index}.price`] = ['Price cannot be negative'];
+                    isValid = false;
+                }
+    
+                // Validate product discount
+                if (product.discount < 0) {
+                    this.errors[`purchaseItems.${index}.discount`] = ['Discount cannot be negative'];
+                    isValid = false;
+                } else {
+                    if (product.discount_type === 'percent' && product.discount > 100) {
+                        this.errors[`purchaseItems.${index}.discount`] = ['Discount percentage cannot exceed 100%'];
+                        isValid = false;
+                    } else if (product.discount_type === 'fixed' && product.discount > product.price) {
+                        this.errors[`purchaseItems.${index}.discount`] = ['Discount amount cannot exceed price'];
+                        isValid = false;
+                    }
+                }
+    
+                // Validate expiry date if set
+                if (product.expiry_date) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const expiryDate = new Date(product.expiry_date);
+                    if (expiryDate <= today) {
+                        this.errors[`purchaseItems.${index}.expiry_date`] = ['Expiry date must be a future date'];
+                        isValid = false;
+                    }
+                }
+            }
+    
+            // Validate global discount
+            if (this.globalDiscount < 0) {
+                this.errors['globalDiscount'] = ['Discount cannot be negative'];
+                isValid = false;
+            } else {
+                const subtotal = this.calculateTotal();
+                if (this.globalDiscountType === 'percent' && this.globalDiscount > 100) {
+                    this.errors['globalDiscount'] = ['Discount percentage cannot exceed 100%'];
+                    isValid = false;
+                } else if (this.globalDiscountType === 'fixed' && this.globalDiscount > subtotal) {
+                    this.errors['globalDiscount'] = ['Discount amount cannot exceed subtotal'];
+                    isValid = false;
+                }
+            }
+    
+            // Validate additional cost
+            if (this.additionalCost < 0) {
+                this.errors['additionalCost'] = ['Additional cost cannot be negative'];
+                isValid = false;
+            }
+    
+            console.log(this.errors);
+            return isValid;
+        },
+    
+        // Helper function to get server-side error for specific field
+        getError(index, field) {
+            if (!this.errors) return null;
+    
+            const path = index !== null ? `purchaseItems.${index}.${field}` : field;
+            return this.errors[path] ? this.errors[path][0] : null;
+        },
+    
+        // Helper function to get specific error
+        getSpecificError(field) {
+            if (!this.errors) return null;
+            return this.errors[field] ? this.errors[field][0] : null;
         }
     }" class="space-y-6">
         <x-filament-panels::form id="form" :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
-            wire:submit="create"
-            @submit.prevent="$wire.set('purchaseItems', products); $wire.set('data.global_discount', globalDiscount); $wire.set('data.global_discount_type', globalDiscountType); $wire.set('data.final_amount', calculateFinalTotal())">
+            {{-- wire:submit="create" --}}
+            @submit.prevent="
+                $event.preventDefault();
+                if (! validateForm()) {
+                    return;
+                }
+                $wire.create().then(() => {
+                    // Form submitted successfully
+                });
+            ">
             <!-- Search Input -->
             <div class="relative">
                 <div class="relative">
@@ -106,6 +204,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Products error -->
+            <div x-show="getError(null, 'purchaseItems')"
+                class="p-2 mt-2 mb-2 text-sm text-red-500 rounded bg-red-50 dark:bg-red-900/10"
+                x-text="getError(null, 'purchaseItems')"></div>
 
             <!-- Products Table -->
             <div class="overflow-hidden bg-white rounded-lg shadow dark:bg-gray-800">
@@ -132,7 +235,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <template x-for="(product, index) in products">
+                            <template x-for="(product, index) in products" :key="index">
                                 <tr class="transition duration-150 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="p-2 text-sm text-gray-700 dark:text-gray-200">
                                         <div
@@ -142,7 +245,11 @@
                                             <div>
                                                 <p class="font-semibold text-gray-700 dark:text-gray-200 line-clamp-3"
                                                     x-text="product.name"></span>
-                                                    <x-datepicker placeholder="Expiry Date" model="product.expiry_date" />
+                                                    <x-datepicker placeholder="Expiry Date"
+                                                        model="product.expiry_date" />
+                                                <div x-show="getError(index, 'expiry_date')"
+                                                    class="mt-1 text-xs text-red-500"
+                                                    x-text="getError(index, 'expiry_date')"></div>
                                             </div>
                                         </div>
                                     </td>
@@ -161,6 +268,8 @@
                                                 <x-tabler-plus class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             </button>
                                         </div>
+                                        <div x-show="getError(index, 'quantity')" class="mt-1 text-xs text-red-500"
+                                            x-text="getError(index, 'quantity')"></div>
                                     </td>
                                     <td class="p-2 whitespace-nowrap">
                                         <div class="relative w-32">
@@ -172,6 +281,8 @@
                                                 <x-tabler-currency-taka class="w-4 h-4" />
                                             </div>
                                         </div>
+                                        <div x-show="getError(index, 'price')" class="mt-1 text-xs text-red-500"
+                                            x-text="getError(index, 'price')"></div>
                                     </td>
                                     <td class="p-2 whitespace-nowrap">
                                         <div class="flex items-center space-x-1">
@@ -190,6 +301,10 @@
                                                 </span>
                                             </button>
                                         </div>
+                                        <div x-show="getError(index, 'discount')" class="mt-1 text-xs text-red-500"
+                                            x-text="getError(index, 'discount')"></div>
+                                        <div x-show="getError(index, 'discount_type')" class="mt-1 text-xs text-red-500"
+                                            x-text="getError(index, 'discount_type')"></div>
                                     </td>
                                     <td class="p-2 text-sm text-gray-700 whitespace-nowrap dark:text-gray-200">
                                         <div class="flex items-center">
@@ -212,6 +327,9 @@
                                         <x-tabler-shopping-cart class="w-8 h-8" />
                                         <p class="text-sm font-medium">No products added to purchase</p>
                                         <p class="text-xs">Search and select products to add them to your purchase</p>
+                                        <div x-show="formSubmitted" class="mt-2 text-sm text-red-500">
+                                            Please add at least one product to the purchase
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -259,6 +377,12 @@
                                                 </span>
                                             </button>
                                         </div>
+                                        <div x-show="getError(null, 'globalDiscount')"
+                                            class="mt-1 text-xs text-red-500"
+                                            x-text="getError(null, 'globalDiscount')"></div>
+                                        <div x-show="getError(null, 'globalDiscountType')"
+                                            class="mt-1 text-xs text-red-500"
+                                            x-text="getError(null, 'globalDiscountType')"></div>
                                     </div>
                                 </div>
                                 <div class="mt-2 text-xs font-medium text-red-500 gap-x-2 dark:text-red-400">
@@ -287,6 +411,8 @@
                                     class="w-full px-3 py-1 text-sm border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
                                     placeholder="Note (optional)">
                             </div>
+                            <div x-show="getError(null, 'additionalCost')" class="mt-1 text-xs text-red-500"
+                                x-text="getError(null, 'additionalCost')"></div>
                         </div>
 
                         <!-- Final Total Card -->
@@ -300,6 +426,8 @@
                                 <x-tabler-currency-taka />
                                 <span class="text-xl font-bold" x-text="calculateFinalTotal().toFixed(2)"></span>
                             </div>
+                            <div x-show="getError(null, 'final_amount')" class="mt-1 text-xs text-red-500"
+                                x-text="getError(null, 'final_amount')"></div>
                         </div>
                     </div>
                 </div>

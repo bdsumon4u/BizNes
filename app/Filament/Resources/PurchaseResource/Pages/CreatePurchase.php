@@ -7,13 +7,10 @@ use App\Models\Product;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class CreatePurchase extends CreateRecord
 {
@@ -21,17 +18,17 @@ class CreatePurchase extends CreateRecord
 
     protected static string $view = 'filament.pages.purchases.create';
 
-    public ?string $search = '';
-
     public array $searchResults = [];
 
     public array $purchaseItems = [];
 
-    public float $globalDiscount = -5;
+    public float $discount = 0;
 
-    public string $globalDiscountType = 'fixed';
+    public string $discountType = 'fixed';
 
-    public float $final_amount = 0;
+    public float $additionalCost = 0;
+
+    public string $additionalCostNote = '';
 
     public $errorMessages = [];
 
@@ -50,113 +47,95 @@ class CreatePurchase extends CreateRecord
         return [];
     }
 
-    public function create(bool $another = false): void
-    {
-        $this->authorizeAccess();
-
-        try {
-            $this->beginDatabaseTransaction();
-
-            $this->callHook('beforeValidate');
-
-            $data = $this->form->getState();
-
-            $this->callHook('afterValidate');
-
-            $data = $this->mutateFormDataBeforeCreate($data);
-
-            $this->callHook('beforeCreate');
-
-            $this->record = $this->handleRecordCreation($data);
-
-            $this->form->model($this->getRecord())->saveRelationships();
-
-            $this->callHook('afterCreate');
-
-            $this->commitDatabaseTransaction();
-        } catch (Halt $exception) {
-            $exception->shouldRollbackDatabaseTransaction() ?
-                $this->rollBackDatabaseTransaction() :
-                $this->commitDatabaseTransaction();
-
-            return;
-        } catch (Throwable $exception) {
-            $this->rollBackDatabaseTransaction();
-
-            throw $exception;
-        }
-
-        $this->rememberData();
-
-        $this->getCreatedNotification()?->send();
-
-        if ($another) {
-            // Ensure that the form record is anonymized so that relationships aren't loaded.
-            $this->form->model($this->getRecord()::class);
-            $this->record = null;
-
-            $this->fillForm();
-
-            return;
-        }
-
-        $redirectUrl = $this->getRedirectUrl();
-
-        $this->redirect($redirectUrl);
-    }
-
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Validate the purchase items
-        $validator = Validator::make([
-            'purchaseItems' => $this->purchaseItems,
-            'globalDiscount' => $this->globalDiscount,
-            'globalDiscountType' => $this->globalDiscountType,
-            'final_amount' => $this->final_amount,
-        ], [
+        // Calculate subtotal from all purchase items
+        $subtotal = collect($this->purchaseItems)->reduce(function ($total, $item) {
+            $itemTotal = $item['price'] * $item['quantity'];
+
+            // Apply individual item discount
+            if ($item['discount_type'] === 'percent') {
+                $itemTotal -= ($itemTotal * $item['discount'] / 100);
+            } else {
+                $itemTotal -= $item['discount'];
+            }
+
+            return $total + $itemTotal;
+        }, 0);
+
+        // Apply global discount
+        if ($this->discountType === 'percent') {
+            $subtotal -= ($subtotal * $this->discount / 100);
+        } else {
+            $subtotal -= $this->discount;
+        }
+
+        // Add additional costs
+        $data['amount'] = $subtotal + $this->additionalCost;
+
+        foreach (['discount', 'discountType', 'additionalCost', 'additionalCostNote'] as $key) {
+            $data[Str::snake($key)] = $this->{$key};
+        }
+
+        return $data;
+    }
+
+    protected function rules(): array
+    {
+        $rules = [
             'purchaseItems' => ['required', 'array', 'min:1'],
             'purchaseItems.*.id' => ['required', 'exists:products,id'],
             'purchaseItems.*.quantity' => ['required', 'numeric', 'min:1'],
             'purchaseItems.*.price' => ['required', 'numeric', 'min:0'],
-            'purchaseItems.*.discount' => ['required', 'numeric', 'min:0'],
             'purchaseItems.*.discount_type' => ['required', 'in:fixed,percent'],
-            'purchaseItems.*.expiry_date' => ['date', 'before:today'],
-            'globalDiscount' => ['required', 'numeric', 'min:0'],
-            'globalDiscountType' => ['required', 'in:fixed,percent'],
-            'final_amount' => ['required', 'numeric', 'min:0'],
-        ], [
-            'purchaseItems.required' => 'Please add at least one product to the purchase',
-            'purchaseItems.min' => 'Please add at least one product to the purchase',
-            'purchaseItems.*.id.required' => 'Product ID is required',
-            'purchaseItems.*.id.exists' => 'Selected product does not exist',
-            'purchaseItems.*.quantity.required' => 'Quantity is required',
-            'purchaseItems.*.quantity.min' => 'Quantity must be at least 1',
-            'purchaseItems.*.price.required' => 'Price is required',
-            'purchaseItems.*.price.min' => 'Price must be at least 0',
-            'purchaseItems.*.discount.min' => 'Discount cannot be negative',
-            'purchaseItems.*.expiry_date.date' => 'Expiry date must be a valid date',
-            'purchaseItems.*.expiry_date.before' => 'Expiry date must be a past date',
-        ]);
+            'purchaseItems.*.expiry_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'discountType' => ['required', 'in:fixed,percent'],
+            'additionalCost' => ['required', 'numeric', 'min:0'],
+        ];
 
-        if ($validator->fails()) {
-            $this->errorMessages = $validator->errors()->toArray();
-
-            // Create a notification for the main error
-            Notification::make()
-                ->title('Validation Error')
-                ->body('Please fix the errors in the form.')
-                ->danger()
-                ->send();
-
-            throw ValidationException::withMessages($validator->errors()->toArray());
+        // Add product discount validation rules
+        foreach ($this->purchaseItems as $index => $item) {
+            $rules["purchaseItems.{$index}.discount"] = ['required', 'numeric', 'min:0', function ($attribute, $value, $fail) use ($item) {
+                if ($item['discount_type'] === 'percent' && $value > 100) {
+                    $fail('Discount percentage cannot exceed 100%');
+                } elseif ($item['discount_type'] === 'fixed' && $value > $item['price']) {
+                    $fail('Discount amount cannot exceed price');
+                }
+            }];
         }
 
-        // Include the global discount and final amount in the purchase record
-        $data['globalDiscount'] = $this->globalDiscount;
-        $data['globalDiscountType'] = $this->globalDiscountType;
-        $data['amount'] = $this->final_amount;
+        // Add global discount validation rule
+        $rules['discount'] = ['required', 'numeric', 'min:0', function ($attribute, $value, $fail) {
+            if ($this->discountType === 'percent' && $value > 100) {
+                $fail('Discount percentage cannot exceed 100%');
+            } elseif ($this->discountType === 'fixed') {
+                $subtotal = collect($this->purchaseItems)->reduce(function ($total, $item) {
+                    return $total + ($item['price'] * $item['quantity']);
+                }, 0);
 
-        return $data;
+                if ($value > $subtotal) {
+                    $fail('Discount amount cannot exceed subtotal');
+                }
+            }
+        }];
+
+        return $rules;
+    }
+
+    protected function afterValidate(): void
+    {
+        $this->validate($this->rules(), attributes: [
+            'purchaseItems.*.quantity' => 'quantity',
+            'purchaseItems.*.price' => 'price',
+            'purchaseItems.*.discount' => 'discount',
+            'purchaseItems.*.expiry_date' => 'expiry date',
+            'purchaseItems.*.discount_type' => 'discount type',
+        ]);
+    }
+
+    protected function onValidationError(ValidationException $exception): void
+    {
+        $this->errorMessages = $exception->errors();
     }
 
     protected function afterCreate(): void
@@ -222,7 +201,8 @@ class CreatePurchase extends CreateRecord
                             })
                             ->toArray();
                     })
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->dehydrated(false),
             ]);
     }
 }

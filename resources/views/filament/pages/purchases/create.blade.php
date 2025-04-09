@@ -4,20 +4,18 @@
 ])>
     <div x-data="{
         products: $wire.entangle('purchaseItems'),
-        search: '',
         searchResults: $wire.entangle('searchResults'),
-        globalDiscount: $wire.entangle('globalDiscount'),
-        globalDiscountType: $wire.entangle('globalDiscountType'),
-        additionalCost: 0,
-        additionalCostNote: '',
+        discount: $wire.entangle('discount'),
+        discountType: $wire.entangle('discountType'),
+        additionalCost: $wire.entangle('additionalCost'),
+        additionalCostNote: $wire.entangle('additionalCostNote'),
         errors: $wire.entangle('errorMessages'),
         formSubmitted: false,
     
         validateProductDiscount(product) {
             if (product.discount_type === 'fixed') {
-                const maxDiscount = product.price * product.quantity;
-                if (product.discount > maxDiscount) {
-                    product.discount = maxDiscount;
+                if (product.discount > product.price) {
+                    product.discount = product.price;
                 }
             } else if (product.discount_type === 'percent') {
                 if (product.discount > 100) {
@@ -26,15 +24,15 @@
             }
         },
     
-        validateGlobalDiscount() {
-            if (this.globalDiscountType === 'fixed') {
+        validatediscount() {
+            if (this.discountType === 'fixed') {
                 const subtotal = this.calculateTotal();
-                if (this.globalDiscount > subtotal) {
-                    this.globalDiscount = subtotal;
+                if (this.discount > subtotal) {
+                    this.discount = subtotal;
                 }
-            } else if (this.globalDiscountType === 'percent') {
-                if (this.globalDiscount > 100) {
-                    this.globalDiscount = 100;
+            } else if (this.discountType === 'percent') {
+                if (this.discount > 100) {
+                    this.discount = 100;
                 }
             }
         },
@@ -57,9 +55,7 @@
                 });
             }
     
-            this.search = '';
             this.searchResults = [];
-            $wire.set('searchResults', []);
             $wire.set('data.search', '');
         },
     
@@ -75,16 +71,16 @@
             return this.products.reduce((total, product) => total + this.calculateSubtotal(product), 0);
         },
     
-        calculateGlobalDiscount() {
+        calculatediscount() {
             const subtotal = this.calculateTotal();
-            if (this.globalDiscountType === 'fixed') {
-                return parseFloat(this.globalDiscount) || 0;
+            if (this.discountType === 'fixed') {
+                return parseFloat(this.discount) || 0;
             }
-            return subtotal * (parseFloat(this.globalDiscount) || 0) / 100;
+            return subtotal * (parseFloat(this.discount) || 0) / 100;
         },
     
         calculateFinalTotal() {
-            return this.calculateTotal() - this.calculateGlobalDiscount() + parseFloat(this.additionalCost || 0);
+            return this.calculateTotal() - this.calculatediscount() + parseFloat(this.additionalCost || 0);
         },
     
         validateForm() {
@@ -129,24 +125,24 @@
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     const expiryDate = new Date(product.expiry_date);
-                    if (expiryDate <= today) {
-                        this.errors[`purchaseItems.${index}.expiry_date`] = ['Expiry date must be a future date'];
+                    if (expiryDate < today) {
+                        this.errors[`purchaseItems.${index}.expiry_date`] = ['Expiry date must be after or equal to today.'];
                         isValid = false;
                     }
                 }
             }
     
             // Validate global discount
-            if (this.globalDiscount < 0) {
-                this.errors['globalDiscount'] = ['Discount cannot be negative'];
+            if (this.discount < 0) {
+                this.errors['discount'] = ['Discount cannot be negative'];
                 isValid = false;
             } else {
                 const subtotal = this.calculateTotal();
-                if (this.globalDiscountType === 'percent' && this.globalDiscount > 100) {
-                    this.errors['globalDiscount'] = ['Discount percentage cannot exceed 100%'];
+                if (this.discountType === 'percent' && this.discount > 100) {
+                    this.errors['discount'] = ['Discount percentage cannot exceed 100%'];
                     isValid = false;
-                } else if (this.globalDiscountType === 'fixed' && this.globalDiscount > subtotal) {
-                    this.errors['globalDiscount'] = ['Discount amount cannot exceed subtotal'];
+                } else if (this.discountType === 'fixed' && this.discount > subtotal) {
+                    this.errors['discount'] = ['Discount amount cannot exceed subtotal'];
                     isValid = false;
                 }
             }
@@ -168,12 +164,6 @@
             const path = index !== null ? `purchaseItems.${index}.${field}` : field;
             return this.errors[path] ? this.errors[path][0] : null;
         },
-    
-        // Helper function to get specific error
-        getSpecificError(field) {
-            if (!this.errors) return null;
-            return this.errors[field] ? this.errors[field][0] : null;
-        }
     }" class="space-y-6">
         <x-filament-panels::form id="form" :wire:key="$this->getId() . '.forms.' . $this->getFormStatePath()"
             {{-- wire:submit="create" --}}
@@ -192,9 +182,9 @@
                     {{ $this->form }}
 
                     <!-- Search Results Dropdown -->
-                    <div x-show="$wire.searchResults.length > 0" x-cloak
+                    <div x-show="searchResults.length > 0" x-cloak
                         class="absolute z-50 w-full mt-1 overflow-hidden bg-white border rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
-                        <template x-for="product in $wire.searchResults">
+                        <template x-for="product in searchResults">
                             <div @click="addProduct(product); $nextTick(() => { document.getElementById('data.search').focus() })"
                                 class="flex items-center p-2 transition duration-150 cursor-pointer gap-x-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <img width="50" height="50" :src="product.image" :alt="product.name" />
@@ -204,11 +194,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Products error -->
-            <div x-show="getError(null, 'purchaseItems')"
-                class="p-2 mt-2 mb-2 text-sm text-red-500 rounded bg-red-50 dark:bg-red-900/10"
-                x-text="getError(null, 'purchaseItems')"></div>
 
             <!-- Products Table -->
             <div class="overflow-hidden bg-white rounded-lg shadow dark:bg-gray-800">
@@ -327,9 +312,7 @@
                                         <x-tabler-shopping-cart class="w-8 h-8" />
                                         <p class="text-sm font-medium">No products added to purchase</p>
                                         <p class="text-xs">Search and select products to add them to your purchase</p>
-                                        <div x-show="formSubmitted" class="mt-2 text-sm text-red-500">
-                                            Please add at least one product to the purchase
-                                        </div>
+                                        <div x-show="getError(null, 'purchaseItems')" class="mt-2 text-sm text-red-500" x-text="getError(null, 'purchaseItems')"></div>
                                     </div>
                                 </td>
                             </tr>
@@ -364,29 +347,29 @@
                                 <div class="flex items-center">
                                     <div class="relative flex-1">
                                         <div class="flex items-center space-x-1">
-                                            <input type="number" x-model="globalDiscount" min="0"
-                                                @input="validateGlobalDiscount()"
+                                            <input type="number" x-model="discount" min="0"
+                                                @input="validatediscount()"
                                                 class="w-24 px-3 py-1 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500"
                                                 @focus="$event.target.select()">
                                             <button type="button"
-                                                @click="globalDiscountType = globalDiscountType === 'fixed' ? 'percent' : 'fixed'; validateGlobalDiscount()"
+                                                @click="discountType = discountType === 'fixed' ? 'percent' : 'fixed'; validatediscount()"
                                                 class="p-1 transition-colors duration-150 bg-gray-100 rounded dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
                                                 <span class="text-gray-700 dark:text-gray-200">
-                                                    <x-tabler-currency-taka x-show="globalDiscountType == 'fixed'" />
-                                                    <x-tabler-percentage x-show="globalDiscountType != 'fixed'" />
+                                                    <x-tabler-currency-taka x-show="discountType == 'fixed'" />
+                                                    <x-tabler-percentage x-show="discountType != 'fixed'" />
                                                 </span>
                                             </button>
                                         </div>
-                                        <div x-show="getError(null, 'globalDiscount')"
+                                        <div x-show="getError(null, 'discount')"
                                             class="mt-1 text-xs text-red-500"
-                                            x-text="getError(null, 'globalDiscount')"></div>
-                                        <div x-show="getError(null, 'globalDiscountType')"
+                                            x-text="getError(null, 'discount')"></div>
+                                        <div x-show="getError(null, 'discountType')"
                                             class="mt-1 text-xs text-red-500"
-                                            x-text="getError(null, 'globalDiscountType')"></div>
+                                            x-text="getError(null, 'discountType')"></div>
                                     </div>
                                 </div>
                                 <div class="mt-2 text-xs font-medium text-red-500 gap-x-2 dark:text-red-400">
-                                    Applied: <span x-text="'- ' + calculateGlobalDiscount().toFixed(2)"></span>
+                                    Applied: <span x-text="'- ' + calculatediscount().toFixed(2)"></span>
                                 </div>
                             </div>
                         </div>
@@ -426,8 +409,6 @@
                                 <x-tabler-currency-taka />
                                 <span class="text-xl font-bold" x-text="calculateFinalTotal().toFixed(2)"></span>
                             </div>
-                            <div x-show="getError(null, 'final_amount')" class="mt-1 text-xs text-red-500"
-                                x-text="getError(null, 'final_amount')"></div>
                         </div>
                     </div>
                 </div>

@@ -44,7 +44,7 @@ class Product extends Model implements IMedia
                 return $this->name;
             }
 
-            return $this->parent->name . ' [' . $this->name . ']';
+            return $this->parent->name.' ['.$this->name.']';
         })->shouldCache();
     }
 

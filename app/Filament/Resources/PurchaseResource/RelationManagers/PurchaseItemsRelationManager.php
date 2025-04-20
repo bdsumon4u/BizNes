@@ -14,29 +14,13 @@ use Filament\Tables\Columns\TextColumn;
 
 class PurchaseItemsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'items';
+    protected static string $relationship = 'products';
 
     public function form(Forms\Form $form): Forms\Form
     {
         return $form
             ->schema([
-                Select::make('purchasable_type')
-                    ->options([
-                        Product::class => 'Product',
-                        Variant::class => 'Variant',
-                    ])
-                    ->reactive()
-                    ->required(),
-
-                Select::make('purchasable_id')
-                    ->label('Product / Variant')
-                    ->options(fn ($get) => match ($get('purchasable_type')) {
-                        Product::class => Product::pluck('name', 'id'),
-                        Variant::class => Variant::pluck('name', 'id'),
-                        default => [],
-                    })
-                    ->searchable()
-                    ->required(),
+                TextInput::make('pivot.name'),
 
                 TextInput::make('price')
                     ->numeric()

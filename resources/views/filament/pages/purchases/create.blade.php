@@ -47,9 +47,9 @@
                     id: product.id,
                     name: product.name,
                     image: product.image,
-                    quantity: -5, // 1,
-                    price: -5, // product.price || 0,
-                    discount: -5, // 0,
+                    quantity: 1,
+                    price: product.price || 0,
+                    discount: 0,
                     discount_type: 'fixed',
                     expiry_date: null,
                 });

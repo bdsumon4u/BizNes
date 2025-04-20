@@ -69,8 +69,8 @@ class PurchaseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('supplier.name')->sortable(),
-                Tables\Columns\TextColumn::make('amount')->sortable(),
-                Tables\Columns\TextColumn::make('date')->sortable(),
+                Tables\Columns\TextColumn::make('total')->money()->sortable(),
+                Tables\Columns\TextColumn::make('date')->date()->sortable(),
             ])
             ->filters([
                 //

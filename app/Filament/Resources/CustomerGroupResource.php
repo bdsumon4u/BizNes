@@ -18,7 +18,7 @@ class CustomerGroupResource extends Resource
 
     protected static ?string $model = CustomerGroup::class;
 
-    protected static ?string $navigationGroup = 'Customer';
+    protected static ?string $navigationGroup = 'Parties';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

@@ -18,6 +18,8 @@ class CreatePurchase extends CreateRecord
 
     protected static string $view = 'filament.pages.purchases.create';
 
+    protected ?bool $hasDatabaseTransactions = true;
+
     public array $searchResults = [];
 
     public array $purchaseItems = [];
@@ -30,7 +32,7 @@ class CreatePurchase extends CreateRecord
 
     public string $additionalCostNote = '';
 
-    public $errorMessages = [];
+    public array $errorMessages = [];
 
     public function getHeading(): string
     {
@@ -50,7 +52,7 @@ class CreatePurchase extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Calculate subtotal from all purchase items
-        $subtotal = collect($this->purchaseItems)->reduce(function ($total, $item) {
+        $data['subtotal'] = collect($this->purchaseItems)->reduce(function ($total, $item) {
             $itemTotal = $item['price'] * $item['quantity'];
 
             // Apply individual item discount
@@ -63,15 +65,16 @@ class CreatePurchase extends CreateRecord
             return $total + $itemTotal;
         }, 0);
 
+        $amount = $data['subtotal'];
         // Apply global discount
         if ($this->discountType === 'percent') {
-            $subtotal -= ($subtotal * $this->discount / 100);
+            $amount -= ($amount * $this->discount / 100);
         } else {
-            $subtotal -= $this->discount;
+            $amount -= $this->discount;
         }
 
         // Add additional costs
-        $data['amount'] = $subtotal + $this->additionalCost;
+        $data['total'] = $amount + $this->additionalCost;
 
         foreach (['discount', 'discountType', 'additionalCost', 'additionalCostNote'] as $key) {
             $data[Str::snake($key)] = $this->{$key};
@@ -140,14 +143,9 @@ class CreatePurchase extends CreateRecord
 
     protected function afterCreate(): void
     {
-        parent::afterCreate();
-
         // Create purchase items
         foreach ($this->purchaseItems as $item) {
-            $this->record->items()->create([
-                'product_id' => $item['id'],
-                'purchasable_type' => Product::class,
-                'purchasable_id' => $item['id'],
+            $this->record->products()->attach($item['id'], [
                 'quantity' => $item['quantity'],
                 'price' => $item['price'],
                 'discount' => $item['discount'],

@@ -80,9 +80,9 @@ class Product extends Model implements IMedia
         return $this->hasMany(Product::class, 'parent_id');
     }
 
-    public function purchases(): MorphMany
+    public function purchases(): BelongsToMany
     {
-        return $this->morphMany(PurchaseItem::class, 'purchasable');
+        return $this->belongsToMany(Purchase::class);
     }
 
     public function stocks(): MorphMany
